@@ -34,6 +34,27 @@ VEHICULOS_SEED = [
     ("3236FGH", "Carga Pesada Oruro", "camion", 6, 600.0, True),
     ("4347IJK", "Camila Navarro", "auto", 2, 45.0, False),          # Vehiculo inactivo
     ("5458LMN", "Mototaxi Express", "moto", 2, 50.0, True),
+    # 20 placas reales capturadas (lote Telegram 2026-11-25)
+    ("6699FAC", "Rodrigo Quispe Ticona", "auto", 2, 120.0, True),
+    ("1215DHY", "Linea 241 El Alto", "minibus", 2, 95.0, True),
+    ("4214FZS", "Lucia Mendoza Chavez", "auto", 2, 110.0, True),
+    ("5639ZCF", "Marco Antonio Huanca", "auto", 2, 130.0, True),
+    ("2540GLR", "Paola Andrea Flores", "auto", 2, 85.0, True),
+    ("2874REK", "Javier Condori Mamani", "auto", 2, 150.0, True),
+    ("1262PLE", "Daniela Vargas Salinas", "auto", 2, 140.0, True),
+    ("1212AZN", "Sindicato Mixto Litoral", "minibus", 2, 90.0, True),
+    ("5592SXK", "Esteban Apaza Nina", "auto", 2, 105.0, True),
+    ("2006EGK", "Fernando Paredes Arce", "auto", 2, 75.0, True),
+    ("2614DNX", "Cooperativa Senkata", "minibus", 2, 115.0, True),
+    ("2753PPC", "Gabriel Morales Cruz", "auto", 2, 100.0, True),
+    ("5212YYN", "Natalia Rojas Bustillos", "auto", 2, 160.0, True),
+    ("2898DUF", "Andres Gutierrez Paz", "auto", 2, 125.0, True),
+    ("2901YRX", "Veronica Loza Velasco", "auto", 2, 95.0, True),
+    ("6396CFD", "Mauricio Salazar Lima", "auto", 2, 135.0, True),
+    ("1316YCK", "Trans Villa Fatima", "minibus", 2, 110.0, True),
+    ("4047CYP", "Distribuidora Illampu", "minibus", 2, 145.0, True),
+    ("2456NXN", "Sergio Velasco Herrera", "auto", 2, 175.0, True),
+    ("2059TLD", "Claudia Miranda Torrez", "auto", 2, 80.0, True),
 ]
 
 TARIFAS_SEED = [
