@@ -51,16 +51,18 @@ El sistema implementa el control automatizado de peaje vehicular de punta a punt
     - Detección: **`100%`** (`10/10`) | Exact Match híbrido: **`90.0%`** (`9/10`) vs `EasyOCR` `80.0%` | **CER promedio:** **`0.0143`**
 
 ### 3.2 M2 — Segmentación de Instancias (`yolo11s-seg`)
-- **Métricas (`resumen_metricas_m2.json` tras ejecutar `entrenamiento/M2_segmentacion_vehiculos.ipynb` en Colab T4):**
-  - `box mAP@50`: `[PENDIENTE EJECUTAR EN COLAB T4]` | `box mAP@50-95`: `[PENDIENTE]`
-  - `mask mAP@50`: `[PENDIENTE EJECUTAR EN COLAB T4]` | `mask mAP@50-95`: `[PENDIENTE]`
-  - `mask mAP@50` por clase (`moto`, `auto`, `minibus`, `camion`, `bus`): `[PENDIENTE]`
+- **Entrenamiento ejecutado en GPU en la nube:** RunPod **NVIDIA A40 (48 GB VRAM, CUDA 12.9)** ejecutando `entrenamiento/M2_segmentacion_vehiculos.ipynb` durante 50 épocas sobre **`3,529` imágenes** (`auto: 6132`, `moto: 1745`, `camion: 1434`, `minibus: 984`, `bus: 884` instancias), tras indisponibilidad temporal de GPU T4 en Google Colab gratuito (HTTP 503).
+- **Métricas medidas (`docs/resumen_metricas_m2.json`, evidencias en `docs/evidencias/m2_results.png`, `docs/evidencias/m2_confusion_matrix.png` y `docs/M2_ejecutado.ipynb`):**
+  - `box mAP@50`: **`0.8951`** | `box mAP@50-95`: **`0.8004`**
+  - `mask mAP@50`: **`0.8870`** | `mask mAP@50-95`: **`0.7182`**
+  - `mask mAP@50` por clase: **`bus: 0.9538`**, **`camion: 0.9049`**, **`auto: 0.8951`**, **`moto: 0.8810`**, **`minibus: 0.8000`**
 
 ### 3.3 M3 — Keypoints de Ruedas y Conteo de Ejes (`yolo11s-pose`)
-- **Métricas (`resumen_metricas_m3.json` tras ejecutar `entrenamiento/M3_keypoints_ruedas.ipynb` en Colab T4):**
-  - `box mAP@50`: `[PENDIENTE EJECUTAR EN COLAB T4]`
-  - `pose mAP@50 (OKS)`: `[PENDIENTE EJECUTAR EN COLAB T4]` | `pose mAP@50-95`: `[PENDIENTE]`
-  - Error en conteo de ejes (`MAE` / exactitud): `[PENDIENTE]`
+- **Entrenamiento ejecutado en GPU en la nube:** RunPod **NVIDIA A40 (48 GB VRAM, CUDA 12.9)** ejecutando `entrenamiento/M3_keypoints_ruedas.ipynb` durante 60 épocas sobre **`924` imágenes** y **`2,023` llantas** (`kpt_shape = [5, 3]`).
+- **Métricas medidas (`docs/resumen_metricas_m3.json`, evidencias en `docs/evidencias/m3_results.png`, `docs/evidencias/m3_confusion_matrix.png` y `docs/M3_ejecutado.ipynb`):**
+  - `box mAP@50`: **`0.7806`**
+  - `pose mAP@50 (OKS)`: **`0.7968`** | `pose mAP@50-95`: **`0.7113`**
+  - Error en conteo de ejes en validación: **`MAE = 0.226`** | **exactitud exacta = `79.45 %`** (`0.7945`)
 
 ---
 
@@ -68,10 +70,11 @@ El sistema implementa el control automatizado de peaje vehicular de punta a punt
 
 - **Mecanismo de tiempo real:** **Server-Sent Events (SSE)** sobre `/api/v1/stream` (con respaldo WebSocket `/api/v1/ws/panel`), elegido por su compatibilidad nativa con proxies HTTPS de PaaS y reconexión automática en navegadores sin requerir servidor broker separado.
 - **Desglose de latencia promedio observada:**
-  - M1 Detección + OCR (benchmark CPU local 49 imgs): **`164.05 ms`**
+  - M1 Detección + OCR en CPU local (49 imágenes filtradas ≥ 36 px): **`164.05 ms`**
+  - M1 Detección + OCR en GPU **NVIDIA A40** (`docs/resumen_metricas_m1_gpu.json`, 50 imágenes sin filtro de tamaño): **`33.76 ms`** promedio
   - Pipeline completo `/predict` en CPU local (imagen real de bus `640×480`, `yolo11s-seg` respaldo + M1+OCR): **`381.0 ms`** (`m1_placa: 29.8 ms`, `m1_ocr: 164.5 ms`, `m2_seg: 155.3 ms`)
-  - Total inferencia en GPU RunPod: `[PENDIENTE MEDIR TRAS INICIAR POD GPU]`
-  - Punta a punta (App móvil → Web HTTPS Render → RunPod GPU → Neon PostgreSQL → Panel SSE): `[PENDIENTE MEDIR EN PRUEBA CON POD GPU ACTIVO]`
+  - Pipeline completo `/predict` en GPU **RunPod NVIDIA A40** (`docs/resumen_latencia_runpod.json`, `6` muestras en estado estacionario tras *warm-up* usando `best_m2_seg.pt` + `best_m3_pose.pt`): **`51.7 ms`** promedio en GPU (p. ej. muestra con lectura OCR: `total 85.0 ms` con `m1_placa: 9.5 ms`, `m1_ocr: 46.9 ms`, `m2_seg: 12.9 ms`, `m3_pose: 10.0 ms`; muestra de camión multi-rueda: `total 38.1 ms`), **7.4× más rápido** que en CPU.
+  - Cliente HTTPS → Proxy RunPod (`https://owi1nqmwo4q1fe-8000.proxy.runpod.net/predict`) → GPU A40 → respuesta JSON con imagen anotada (`docs/evidencias/runpod_predict_ejemplo.jpg`): **`524.8 ms`** RTT promedio en estado estacionario (`1,800.5 ms` en primera llamada de arranque); ambos `/health` verificados en `200 OK` tras enlazar `INFERENCE_URL` en Render (`dep-dc3h9dqfngtc73e0i5v0`). *(El Pod RunPod fue terminado tras respaldar ambos `.pt` en `inferencia/models/` para conservar saldo hasta la grabación del video demo.)*
 
 ---
 

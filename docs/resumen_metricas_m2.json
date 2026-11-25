@@ -1,0 +1,22 @@
+{
+  "modelo": "yolo11s-seg",
+  "total_imagenes_dataset": 3529,
+  "instancias_por_clase": {
+    "auto": 6132,
+    "bus": 884,
+    "camion": 1434,
+    "minibus": 984,
+    "moto": 1745
+  },
+  "box_map50": 0.8951,
+  "box_map50_95": 0.8004,
+  "mask_map50": 0.887,
+  "mask_map50_95": 0.7182,
+  "mask_map50_por_clase": {
+    "auto": 0.8951,
+    "bus": 0.9538,
+    "camion": 0.9049,
+    "minibus": 0.8,
+    "moto": 0.881
+  }
+}

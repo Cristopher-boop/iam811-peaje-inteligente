@@ -1,0 +1,44 @@
+{
+  "servicio": "runpod",
+  "timestamp_utc": "2026-11-25T17:29:48.320325+00:00",
+  "sistema": {
+    "os": "Linux-6.8.0-149-generic-x86_64-with-glibc2.39",
+    "python_version": "3.12.3",
+    "arquitectura": "x86_64"
+  },
+  "entorno": {
+    "tipo": "venv",
+    "conda_default_env": null,
+    "conda_prefix": null,
+    "virtual_env": "/workspace/venv_peaje",
+    "executable": "/workspace/venv_peaje/bin/python"
+  },
+  "cuda": {
+    "disponible": true,
+    "cuda_build": "12.9",
+    "gpu_count": 1,
+    "gpu_name": "NVIDIA A40"
+  },
+  "paquetes": {
+    "torch": "2.8.0+cu129",
+    "torchvision": "0.23.0+cu129",
+    "ultralytics": "8.4.218",
+    "cv2": "5.1.0",
+    "numpy": "2.5.4",
+    "onnxruntime": "1.32.0",
+    "fast_plate_ocr": "1.1.0",
+    "easyocr": "1.7.2",
+    "fastapi": "0.165.0",
+    "uvicorn": "0.54.0",
+    "sqlalchemy": "no disponible (ModuleNotFoundError)",
+    "psycopg": "no disponible (ModuleNotFoundError)",
+    "httpx": "0.28.1",
+    "openai": "no disponible (ModuleNotFoundError)",
+    "roboflow": "1.7.4"
+  },
+  "onnxruntime_providers": [
+    "TensorrtExecutionProvider",
+    "CUDAExecutionProvider",
+    "CPUExecutionProvider"
+  ]
+}

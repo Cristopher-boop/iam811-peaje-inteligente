@@ -35,7 +35,7 @@ flowchart TD
 | :--- | :--- |
 | **Aplicación Web (Subdominio HTTPS)** | `https://peaje-iam811-web.onrender.com` |
 | **Documentación Swagger / OpenAPI** | `https://peaje-iam811-web.onrender.com/docs` |
-| **Endpoint de Inferencia (RunPod)** | `https://[POD_ID]-8000.proxy.runpod.net` |
+| **Endpoint de Inferencia (RunPod)** | `https://owi1nqmwo4q1fe-8000.proxy.runpod.net` *(validado en NVIDIA A40; pod terminado para conservar saldo, pesos `best_m2_seg.pt` y `best_m3_pose.pt` incluidos en `inferencia/models/` para relanzar con `start_runpod.sh`)* |
 | **Dataset M2 en Roboflow (Segmentación)** | `https://app.roboflow.com/cristopher-diego-rodriguez-ayala/peaje-vehiculos-seg-6laub` |
 | **Dataset M3 en Roboflow (Keypoints ruedas)** | `https://app.roboflow.com/cristopher-diego-rodriguez-ayala/peaje-llantas-keypoints` |
 | **Carpeta de Evidencias (Drive/OneDrive)** | `[COMPLETAR-ENLACE-CARPETA]` |

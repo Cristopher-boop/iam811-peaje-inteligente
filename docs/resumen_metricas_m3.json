@@ -1,0 +1,14 @@
+{
+  "modelo": "yolo11s-pose",
+  "total_imagenes": 924,
+  "total_llantas": 2023,
+  "kpt_shape": [
+    5,
+    3
+  ],
+  "box_map50": 0.7806,
+  "pose_map50": 0.7968,
+  "pose_map50_95": 0.7113,
+  "ejes_mae_valid": 0.226,
+  "ejes_exactitud_valid": 0.7945
+}

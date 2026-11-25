@@ -1,0 +1,246 @@
+{
+  "runpod_url": "https://owi1nqmwo4q1fe-8000.proxy.runpod.net",
+  "gpu": "NVIDIA A40",
+  "steady_avg_gpu_ms": 51.7,
+  "steady_avg_http_rtt_ms": 524.82,
+  "muestras": [
+    {
+      "muestra": "minibus",
+      "archivo": "m2_00064_jpg.rf.be903797fc95d96d4128369e0a305db1.jpg",
+      "http_rtt_ms": 1800.5,
+      "latencia_gpu_ms": {
+        "total": 59.2,
+        "m1_placa": 9.8,
+        "m1_ocr": 0.0,
+        "m2_seg": 20.7,
+        "m3_pose": 16.0
+      },
+      "placa": {
+        "texto": "",
+        "texto_crudo": "",
+        "confianza": 0.0,
+        "confianza_deteccion": 0.0,
+        "formato_bolivia": false,
+        "bbox": null,
+        "lector": "ninguno"
+      },
+      "vehiculo": {
+        "categoria": "minibus",
+        "confianza": 0.427,
+        "area_mascara": 0.4925,
+        "bbox": [
+          74.8,
+          4.0,
+          610.6,
+          623.0
+        ]
+      },
+      "ejes": 2,
+      "llantas_detectadas": 3
+    },
+    {
+      "muestra": "bus",
+      "archivo": "m2_00196_jpg.rf.f74dc55c7194e838f51760605e30313d.jpg",
+      "http_rtt_ms": 543.6,
+      "latencia_gpu_ms": {
+        "total": 41.8,
+        "m1_placa": 9.5,
+        "m1_ocr": 0.0,
+        "m2_seg": 14.8,
+        "m3_pose": 11.3
+      },
+      "placa": {
+        "texto": "",
+        "texto_crudo": "",
+        "confianza": 0.0,
+        "confianza_deteccion": 0.0,
+        "formato_bolivia": false,
+        "bbox": null,
+        "lector": "ninguno"
+      },
+      "vehiculo": {
+        "categoria": "bus",
+        "confianza": 0.611,
+        "area_mascara": 0.1047,
+        "bbox": [
+          301.2,
+          334.8,
+          553.6,
+          548.3
+        ]
+      },
+      "ejes": null,
+      "llantas_detectadas": 0
+    },
+    {
+      "muestra": "moto",
+      "archivo": "m2_00197_jpg.rf.de3e0447931d1dc3eb72106d0924ba2c.jpg",
+      "http_rtt_ms": 567.8,
+      "latencia_gpu_ms": {
+        "total": 85.0,
+        "m1_placa": 9.5,
+        "m1_ocr": 46.9,
+        "m2_seg": 12.9,
+        "m3_pose": 10.0
+      },
+      "placa": {
+        "texto": "572TXPB",
+        "texto_crudo": "572TXPB",
+        "confianza": 0.866,
+        "confianza_deteccion": 0.836,
+        "formato_bolivia": false,
+        "bbox": [
+          217,
+          402,
+          251,
+          430
+        ],
+        "lector": "fast-plate-ocr"
+      },
+      "vehiculo": {
+        "categoria": "minibus",
+        "confianza": 0.959,
+        "area_mascara": 0.1795,
+        "bbox": [
+          92.0,
+          149.9,
+          317.0,
+          511.7
+        ]
+      },
+      "ejes": 2,
+      "llantas_detectadas": 1
+    },
+    {
+      "muestra": "auto",
+      "archivo": "m2_01076_jpg.rf.abbee77d1cacd71da599cedfddccc5d9.jpg",
+      "http_rtt_ms": 594.1,
+      "latencia_gpu_ms": {
+        "total": 40.4,
+        "m1_placa": 10.8,
+        "m1_ocr": 0.0,
+        "m2_seg": 12.7,
+        "m3_pose": 8.7
+      },
+      "placa": {
+        "texto": "",
+        "texto_crudo": "",
+        "confianza": 0.0,
+        "confianza_deteccion": 0.0,
+        "formato_bolivia": false,
+        "bbox": null,
+        "lector": "ninguno"
+      },
+      "vehiculo": {
+        "categoria": "bus",
+        "confianza": 0.892,
+        "area_mascara": 0.5816,
+        "bbox": [
+          18.8,
+          81.1,
+          544.3,
+          638.5
+        ]
+      },
+      "ejes": null,
+      "llantas_detectadas": 0
+    },
+    {
+      "muestra": "camion",
+      "archivo": "m2_01089_jpg.rf.49892d31862082ce1e9421007fa8b7af.jpg",
+      "http_rtt_ms": 522.4,
+      "latencia_gpu_ms": {
+        "total": 75.7,
+        "m1_placa": 7.8,
+        "m1_ocr": 37.1,
+        "m2_seg": 11.7,
+        "m3_pose": 8.7
+      },
+      "placa": {
+        "texto": "J14",
+        "texto_crudo": "_J1__4",
+        "confianza": 0.577,
+        "confianza_deteccion": 0.859,
+        "formato_bolivia": false,
+        "bbox": [
+          341,
+          565,
+          414,
+          602
+        ],
+        "lector": "fast-plate-ocr"
+      },
+      "vehiculo": {
+        "categoria": "auto",
+        "confianza": 0.897,
+        "area_mascara": 0.7741,
+        "bbox": [
+          3.6,
+          5.7,
+          639.8,
+          637.7
+        ]
+      },
+      "ejes": null,
+      "llantas_detectadas": 0
+    },
+    {
+      "muestra": "m3_camion_ejes",
+      "archivo": "m3_00029_jpg.rf.b323c24aceecb867098267780cfe2234.jpg",
+      "http_rtt_ms": 497.1,
+      "latencia_gpu_ms": {
+        "total": 38.1,
+        "m1_placa": 8.4,
+        "m1_ocr": 0.0,
+        "m2_seg": 12.3,
+        "m3_pose": 10.2
+      },
+      "placa": {
+        "texto": "",
+        "texto_crudo": "",
+        "confianza": 0.0,
+        "confianza_deteccion": 0.0,
+        "formato_bolivia": false,
+        "bbox": null,
+        "lector": "ninguno"
+      },
+      "vehiculo": {
+        "categoria": "camion",
+        "confianza": 0.926,
+        "area_mascara": 0.3457,
+        "bbox": [
+          164.3,
+          0.0,
+          639.9,
+          381.9
+        ]
+      },
+      "ejes": 2,
+      "llantas_detectadas": 3
+    },
+    {
+      "muestra": "m3_camion_ejes",
+      "archivo": "m3_00030_jpg.rf.8d00b1ac743b5b8788b2ec9c979dbc50.jpg",
+      "http_rtt_ms": 423.9,
+      "latencia_gpu_ms": {
+        "total": 29.2,
+        "m1_placa": 7.7,
+        "m1_ocr": 0.0,
+        "m2_seg": 9.7,
+        "m3_pose": 9.6
+      },
+      "placa": {
+        "texto": "",
+        "texto_crudo": "",
+        "confianza": 0.0,
+        "confianza_deteccion": 0.0,
+        "formato_bolivia": false,
+        "bbox": null,
+        "lector": "ninguno"
+      },
+      "vehiculo": {},
+      "ejes": null,
+      "llantas_detectadas": 4
+    }
+  ]
+}

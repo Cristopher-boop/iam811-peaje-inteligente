@@ -1,0 +1,7 @@
+{
+  "total_imagenes": 50,
+  "tasa_deteccion_placa": 0.48,
+  "tasa_lectura_no_vacia": 0.38,
+  "confianza_ocr_promedio": 0.6054,
+  "latencia_promedio_ms": 33.76
+}
