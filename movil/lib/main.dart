@@ -79,13 +79,26 @@ class _HomeShellState extends State<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
+    final isLandscape = MediaQuery.of(context).size.width > MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: isLandscape ? 46 : kToolbarHeight,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.session.nombre, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-            Text('${widget.session.rol.toUpperCase()} · ${widget.session.email}', style: const TextStyle(fontSize: 11, color: Colors.white70)),
+            Text(
+              widget.session.nombre,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: isLandscape ? 13 : 14, fontWeight: FontWeight.bold),
+            ),
+            if (!isLandscape)
+              Text(
+                '${widget.session.rol.toUpperCase()} · ${widget.session.email}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 11, color: Colors.white70),
+              ),
           ],
         ),
         actions: [
@@ -110,6 +123,7 @@ class _HomeShellState extends State<HomeShell> {
           ? CasetaPage(api: widget.api, casetaId: _casetaId)
           : ConsultaPage(api: widget.api),
       bottomNavigationBar: NavigationBar(
+        height: isLandscape ? 54 : 70,
         selectedIndex: _tab,
         onDestinationSelected: (i) => setState(() => _tab = i),
         destinations: const [

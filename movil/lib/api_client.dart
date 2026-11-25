@@ -61,11 +61,16 @@ class TollApiClient {
     return session!;
   }
 
-  Future<Map<String, dynamic>> sendFrame(Uint8List jpegBytes, int casetaId) async {
+  Future<Map<String, dynamic>> sendFrame(
+    Uint8List jpegBytes,
+    int casetaId, {
+    String modo = 'manual',
+  }) async {
     final uri = Uri.parse('${config.backendUrl}/api/v1/pasos/frame');
     final req = http.MultipartRequest('POST', uri)
       ..headers.addAll(_authHeaders())
       ..fields['caseta_id'] = casetaId.toString()
+      ..fields['modo'] = modo
       ..files.add(http.MultipartFile.fromBytes('file', jpegBytes, filename: 'frame.jpg'));
 
     final streamed = await req.send().timeout(const Duration(seconds: 40));

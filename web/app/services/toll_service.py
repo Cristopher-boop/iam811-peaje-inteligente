@@ -169,6 +169,54 @@ def _decodificar_evidencia(inferencia_res: dict[str, Any], raw_bytes: bytes) -> 
     return raw_bytes
 
 
+def verificar_cooldown_stream(
+    db: Session,
+    caseta_id: int,
+    inferencia_res: dict[str, Any],
+    segundos_placa: int = 8,
+    segundos_ilegible: int = 4,
+) -> tuple[bool, str | None, Paso | None]:
+    """Evita cobros duplicados y alertas repetidas cuando el celular transmite video continuo."""
+    placa_obj = inferencia_res.get("placa") or {}
+    placa_norm = normalizar_placa(placa_obj.get("texto") or placa_obj.get("texto_crudo") or "")
+    vehiculo_obj = inferencia_res.get("vehiculo") or {}
+    categoria = (vehiculo_obj.get("categoria") or inferencia_res.get("categoria") or "").strip().lower()
+
+    if not categoria and not placa_norm:
+        return True, "sin_vehiculo", None
+
+    ahora = datetime.now(timezone.utc)
+    if placa_norm and len(placa_norm) >= 4:
+        limite = ahora - timedelta(seconds=segundos_placa)
+        reciente = db.scalar(
+            select(Paso)
+            .where(
+                Paso.caseta_id == caseta_id,
+                Paso.placa_normalizada == placa_norm,
+                Paso.created_at >= limite,
+            )
+            .order_by(desc(Paso.created_at))
+        )
+        if reciente is not None:
+            return True, "cooldown_placa", reciente
+    elif categoria:
+        limite = ahora - timedelta(seconds=segundos_ilegible)
+        reciente_ileg = db.scalar(
+            select(Paso)
+            .where(
+                Paso.caseta_id == caseta_id,
+                Paso.estado == "ILEGIBLE",
+                Paso.categoria_detectada == categoria,
+                Paso.created_at >= limite,
+            )
+            .order_by(desc(Paso.created_at))
+        )
+        if reciente_ileg is not None:
+            return True, "cooldown_vehiculo", reciente_ileg
+
+    return False, None, None
+
+
 def registrar_paso(
     db: Session,
     usuario: Usuario,

@@ -42,6 +42,7 @@ from app.services.toll_service import (
     registrar_paso,
     serializar_alerta,
     serializar_paso,
+    verificar_cooldown_stream,
     verificar_salud_inferencia,
 )
 
@@ -92,6 +93,7 @@ async def auth_google(payload: GoogleAuthRequest, db: Session = Depends(get_db))
 async def registrar_paso_frame(
     request: Request,
     caseta_id: int = Form(default=1),
+    modo: str = Form(default="manual"),
     file: UploadFile | None = File(default=None),
     imagen: UploadFile | None = File(default=None),
     frame: UploadFile | None = File(default=None),
@@ -107,6 +109,7 @@ async def registrar_paso_frame(
         if "application/json" in ctype:
             body = await request.json()
             caseta_id = int(body.get("caseta_id", caseta_id))
+            modo = str(body.get("modo", modo))
             b64 = body.get("image_base64") or body.get("imagen_base64") or body.get("image")
             if b64:
                 if "," in b64:
@@ -117,6 +120,34 @@ async def registrar_paso_frame(
         raise HTTPException(status_code=400, detail="Debes adjuntar una imagen en 'file', 'imagen' o 'image_base64'")
 
     inferencia_res = await llamar_inferencia(raw_bytes, solo_placa=False)
+    inferencia_resumen = {
+        "placa": inferencia_res.get("placa"),
+        "vehiculo": inferencia_res.get("vehiculo"),
+        "ejes": inferencia_res.get("ejes"),
+        "vista": inferencia_res.get("vista"),
+        "keypoints": inferencia_res.get("keypoints", []),
+        "latencia_ms": inferencia_res.get("latencia_ms"),
+    }
+
+    if modo.strip().lower() == "stream":
+        omitir, motivo, paso_previo = verificar_cooldown_stream(db, caseta_id, inferencia_res)
+        if omitir:
+            veh_prev = (
+                db.scalar(select(Vehiculo).where(Vehiculo.placa == paso_previo.placa_normalizada))
+                if paso_previo and paso_previo.placa_normalizada
+                else None
+            )
+            return {
+                "registrado": False,
+                "motivo": motivo,
+                "paso": serializar_paso(paso_previo) if paso_previo else None,
+                "alerta": None,
+                "saldo_restante": round(veh_prev.saldo, 2) if veh_prev else None,
+                "propietario": veh_prev.propietario if veh_prev else None,
+                "inferencia": inferencia_resumen,
+                "resumen_hoy": obtener_resumen_hoy(db),
+            }
+
     paso, alerta, vehiculo = registrar_paso(db, user, caseta_id, inferencia_res, raw_bytes)
     resumen = obtener_resumen_hoy(db)
 
@@ -128,18 +159,13 @@ async def registrar_paso_frame(
         await hub.broadcast("nueva_alerta", {"alerta": alerta_json, "resumen": resumen})
 
     return {
+        "registrado": True,
+        "motivo": "registrado",
         "paso": paso_json,
         "alerta": alerta_json,
         "saldo_restante": round(vehiculo.saldo, 2) if vehiculo else None,
         "propietario": vehiculo.propietario if vehiculo else None,
-        "inferencia": {
-            "placa": inferencia_res.get("placa"),
-            "vehiculo": inferencia_res.get("vehiculo"),
-            "ejes": inferencia_res.get("ejes"),
-            "vista": inferencia_res.get("vista"),
-            "keypoints": inferencia_res.get("keypoints", []),
-            "latencia_ms": inferencia_res.get("latencia_ms"),
-        },
+        "inferencia": inferencia_resumen,
         "resumen_hoy": resumen,
     }
 

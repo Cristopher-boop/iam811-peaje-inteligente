@@ -164,3 +164,27 @@ def test_registro_paso_frame_tarifa_y_alertas(client: TestClient):
     assert client.get("/api/v1/casetas/1/resumen", headers=headers).status_code == 200
     hist = client.get("/api/v1/placas/2481-KLM/historial", headers=headers).json()
     assert hist["total_pasos"] >= 2
+
+    # E. Modo stream: frame sin vehiculo ni placa no ensucia BD, y cooldown evita doble cobro
+    with patch("app.routers.api_v1.llamar_inferencia", new=AsyncMock(return_value={"placa": {"texto": ""}, "vehiculo": {}})):
+        r_vacio = client.post(
+            "/api/v1/pasos/frame",
+            headers=headers,
+            data={"caseta_id": "1", "modo": "stream"},
+            files={"file": ("vacio.jpg", b"fake", "image/jpeg")},
+        )
+    assert r_vacio.status_code == 200
+    assert r_vacio.json()["registrado"] is False
+    assert r_vacio.json()["motivo"] == "sin_vehiculo"
+
+    with patch("app.routers.api_v1.llamar_inferencia", new=AsyncMock(return_value=fake_inf_ok)):
+        r_dup = client.post(
+            "/api/v1/pasos/frame",
+            headers=headers,
+            data={"caseta_id": "1", "modo": "stream"},
+            files={"file": ("dup.jpg", b"fake", "image/jpeg")},
+        )
+    assert r_dup.status_code == 200
+    assert r_dup.json()["registrado"] is False
+    assert r_dup.json()["motivo"] == "cooldown_placa"
+    assert r_dup.json()["saldo_restante"] == 115.0

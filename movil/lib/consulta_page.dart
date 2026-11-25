@@ -78,6 +78,7 @@ class _ConsultaPageState extends State<ConsultaPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isLandscape = MediaQuery.of(context).size.width > MediaQuery.of(context).size.height;
     return Column(
       children: [
         Expanded(
@@ -113,7 +114,11 @@ class _ConsultaPageState extends State<ConsultaPage> {
                       if (m.imageBytes != null) ...[
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: Image.memory(m.imageBytes!, height: 140, fit: BoxFit.cover),
+                          child: Image.memory(
+                            m.imageBytes!,
+                            height: isLandscape ? 92 : 140,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                         const SizedBox(height: 6),
                       ],
