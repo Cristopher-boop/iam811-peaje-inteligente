@@ -36,8 +36,8 @@ flowchart TD
 | **Aplicación Web (Subdominio HTTPS)** | `https://[COMPLETAR-SUBDOMINIO]` |
 | **Documentación Swagger / OpenAPI** | `https://[COMPLETAR-SUBDOMINIO]/docs` |
 | **Endpoint de Inferencia (RunPod)** | `https://[POD_ID]-8000.proxy.runpod.net` |
-| **Dataset M2 en Roboflow (Segmentación)** | `https://app.roboflow.com/[COMPLETAR-WORKSPACE]/[COMPLETAR-PROYECTO-M2]` |
-| **Dataset M3 en Roboflow (Keypoints ruedas)** | `https://app.roboflow.com/[COMPLETAR-WORKSPACE]/[COMPLETAR-PROYECTO-M3]` |
+| **Dataset M2 en Roboflow (Segmentación)** | `https://app.roboflow.com/cristopher-diego-rodriguez-ayala/peaje-vehiculos-seg-6laub` |
+| **Dataset M3 en Roboflow (Keypoints ruedas)** | `https://app.roboflow.com/cristopher-diego-rodriguez-ayala/peaje-llantas-keypoints` |
 | **Carpeta de Evidencias (Drive/OneDrive)** | `[COMPLETAR-ENLACE-CARPETA]` |
 
 ---
