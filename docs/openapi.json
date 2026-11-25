@@ -1,0 +1,1675 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Sistema Inteligente de Control de Peaje — IAM-811",
+    "description": "Panel en tiempo real, API REST v1, autenticacion Google OAuth 2.0 y Agente Conversacional Qwen.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "Sistema"
+        ],
+        "summary": "Healthcheck",
+        "operationId": "healthcheck_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Healthcheck Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/google": {
+      "post": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Autentica un token de Google y devuelve JWT del sistema",
+        "operationId": "auth_google_api_v1_auth_google_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleAuthRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Auth Google Api V1 Auth Google Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/pasos/frame": {
+      "post": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Recibe un frame desde la app movil, infiere, registra paso y emite en tiempo real",
+        "operationId": "registrar_paso_frame_api_v1_pasos_frame_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_registrar_paso_frame_api_v1_pasos_frame_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Registrar Paso Frame Api V1 Pasos Frame Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/placas/consultar": {
+      "post": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Consulta el estado de una placa por texto",
+        "operationId": "consultar_placa_texto_api_v1_placas_consultar_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlacaConsultarRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Consultar Placa Texto Api V1 Placas Consultar Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/placas/consultar-imagen": {
+      "post": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Extrae la placa desde imagen (M1 + OCR) y consulta su estado",
+        "operationId": "consultar_placa_imagen_api_v1_placas_consultar_imagen_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_consultar_placa_imagen_api_v1_placas_consultar_imagen_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Consultar Placa Imagen Api V1 Placas Consultar Imagen Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/placas/{placa}/historial": {
+      "get": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Historial de pasos de una placa",
+        "operationId": "historial_placa_api_v1_placas__placa__historial_get",
+        "parameters": [
+          {
+            "name": "placa",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Placa"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Historial Placa Api V1 Placas  Placa  Historial Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/casetas/{caseta_id}/resumen": {
+      "get": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Conteo y recaudacion del dia para una caseta",
+        "operationId": "resumen_caseta_api_v1_casetas__caseta_id__resumen_get",
+        "parameters": [
+          {
+            "name": "caseta_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Caseta Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Resumen Caseta Api V1 Casetas  Caseta Id  Resumen Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agente/chat": {
+      "post": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Envia un mensaje o foto de placa al agente conversacional",
+        "operationId": "agente_chat_api_v1_agente_chat_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_agente_chat_api_v1_agente_chat_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Agente Chat Api V1 Agente Chat Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stream": {
+      "get": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Stream Server-Sent Events para actualizaciones en tiempo real",
+        "operationId": "sse_stream_api_v1_stream_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/evidencias/{evidencia_id}.jpg": {
+      "get": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Imagen de evidencia anotada almacenada en BD",
+        "operationId": "obtener_evidencia_api_v1_evidencias__evidencia_id__jpg_get",
+        "parameters": [
+          {
+            "name": "evidencia_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Evidencia Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/estado-inferencia": {
+      "get": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Verifica la salud del endpoint de inferencia en la nube",
+        "operationId": "estado_inferencia_api_v1_estado_inferencia_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Estado Inferencia Api V1 Estado Inferencia Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/pasos": {
+      "get": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Listar Pasos",
+        "operationId": "listar_pasos_api_v1_pasos_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Listar Pasos Api V1 Pasos Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/alertas": {
+      "get": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Listar Alertas",
+        "operationId": "listar_alertas_api_v1_alertas_get",
+        "parameters": [
+          {
+            "name": "solo_pendientes",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Solo Pendientes"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Listar Alertas Api V1 Alertas Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/alertas/{alerta_id}/atender": {
+      "post": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Atender Alerta",
+        "operationId": "atender_alerta_api_v1_alertas__alerta_id__atender_post",
+        "parameters": [
+          {
+            "name": "alerta_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Alerta Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Atender Alerta Api V1 Alertas  Alerta Id  Atender Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/vehiculos": {
+      "get": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Listar Vehiculos",
+        "operationId": "listar_vehiculos_api_v1_vehiculos_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Listar Vehiculos Api V1 Vehiculos Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Crear Vehiculo",
+        "operationId": "crear_vehiculo_api_v1_vehiculos_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VehiculoCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Crear Vehiculo Api V1 Vehiculos Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/vehiculos/{vehiculo_id}": {
+      "put": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Actualizar Vehiculo",
+        "operationId": "actualizar_vehiculo_api_v1_vehiculos__vehiculo_id__put",
+        "parameters": [
+          {
+            "name": "vehiculo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Vehiculo Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VehiculoUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Actualizar Vehiculo Api V1 Vehiculos  Vehiculo Id  Put"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Eliminar Vehiculo",
+        "operationId": "eliminar_vehiculo_api_v1_vehiculos__vehiculo_id__delete",
+        "parameters": [
+          {
+            "name": "vehiculo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Vehiculo Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Eliminar Vehiculo Api V1 Vehiculos  Vehiculo Id  Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/vehiculos/{vehiculo_id}/recargar": {
+      "post": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Recargar Vehiculo",
+        "operationId": "recargar_vehiculo_api_v1_vehiculos__vehiculo_id__recargar_post",
+        "parameters": [
+          {
+            "name": "vehiculo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Vehiculo Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecargaRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Recargar Vehiculo Api V1 Vehiculos  Vehiculo Id  Recargar Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tarifas": {
+      "get": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Listar Tarifas",
+        "operationId": "listar_tarifas_api_v1_tarifas_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Listar Tarifas Api V1 Tarifas Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Upsert Tarifa",
+        "operationId": "upsert_tarifa_api_v1_tarifas_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TarifaUpsert"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Upsert Tarifa Api V1 Tarifas Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/casetas": {
+      "get": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Listar Casetas",
+        "operationId": "listar_casetas_api_v1_casetas_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Listar Casetas Api V1 Casetas Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Crear Caseta",
+        "operationId": "crear_caseta_api_v1_casetas_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CasetaCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Crear Caseta Api V1 Casetas Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/usuarios": {
+      "get": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Listar Usuarios",
+        "operationId": "listar_usuarios_api_v1_usuarios_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Listar Usuarios Api V1 Usuarios Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Crear Usuario",
+        "operationId": "crear_usuario_api_v1_usuarios_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Crear Usuario Api V1 Usuarios Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/usuarios/{usuario_id}": {
+      "patch": {
+        "tags": [
+          "API Peaje v1"
+        ],
+        "summary": "Actualizar Usuario",
+        "operationId": "actualizar_usuario_api_v1_usuarios__usuario_id__patch",
+        "parameters": [
+          {
+            "name": "usuario_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Usuario Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioToggle"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Actualizar Usuario Api V1 Usuarios  Usuario Id  Patch"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "get": {
+        "tags": [
+          "Web UI"
+        ],
+        "summary": "Login Page",
+        "operationId": "login_page_login_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/google/login": {
+      "get": {
+        "tags": [
+          "Web UI"
+        ],
+        "summary": "Google Login",
+        "operationId": "google_login_auth_google_login_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/google/callback": {
+      "get": {
+        "tags": [
+          "Web UI"
+        ],
+        "summary": "Google Callback",
+        "operationId": "google_callback_auth_google_callback_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/logout": {
+      "get": {
+        "tags": [
+          "Web UI"
+        ],
+        "summary": "Logout",
+        "operationId": "logout_logout_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "tags": [
+          "Web UI"
+        ],
+        "summary": "Dashboard Page",
+        "operationId": "dashboard_page__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vehiculos": {
+      "get": {
+        "tags": [
+          "Web UI"
+        ],
+        "summary": "Vehiculos Page",
+        "operationId": "vehiculos_page_vehiculos_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pasos": {
+      "get": {
+        "tags": [
+          "Web UI"
+        ],
+        "summary": "Pasos Page",
+        "operationId": "pasos_page_pasos_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/alertas": {
+      "get": {
+        "tags": [
+          "Web UI"
+        ],
+        "summary": "Alertas Page",
+        "operationId": "alertas_page_alertas_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat": {
+      "get": {
+        "tags": [
+          "Web UI"
+        ],
+        "summary": "Chat Page",
+        "operationId": "chat_page_chat_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/estado": {
+      "get": {
+        "tags": [
+          "Web UI"
+        ],
+        "summary": "Estado Page",
+        "operationId": "estado_page_estado_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Body_agente_chat_api_v1_agente_chat_post": {
+        "properties": {
+          "mensaje": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mensaje"
+          },
+          "file": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "binary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File"
+          },
+          "imagen": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "binary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Imagen"
+          }
+        },
+        "type": "object",
+        "title": "Body_agente_chat_api_v1_agente_chat_post"
+      },
+      "Body_consultar_placa_imagen_api_v1_placas_consultar_imagen_post": {
+        "properties": {
+          "file": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "binary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File"
+          },
+          "imagen": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "binary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Imagen"
+          }
+        },
+        "type": "object",
+        "title": "Body_consultar_placa_imagen_api_v1_placas_consultar_imagen_post"
+      },
+      "Body_registrar_paso_frame_api_v1_pasos_frame_post": {
+        "properties": {
+          "caseta_id": {
+            "type": "integer",
+            "title": "Caseta Id",
+            "default": 1
+          },
+          "file": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "binary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File"
+          },
+          "imagen": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "binary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Imagen"
+          },
+          "frame": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "binary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Frame"
+          }
+        },
+        "type": "object",
+        "title": "Body_registrar_paso_frame_api_v1_pasos_frame_post"
+      },
+      "CasetaCreate": {
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 2,
+            "title": "Nombre"
+          },
+          "ubicacion": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 2,
+            "title": "Ubicacion"
+          },
+          "activa": {
+            "type": "boolean",
+            "title": "Activa",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "nombre",
+          "ubicacion"
+        ],
+        "title": "CasetaCreate"
+      },
+      "GoogleAuthRequest": {
+        "properties": {
+          "id_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id Token",
+            "description": "ID Token emitido por Google Sign-In"
+          },
+          "token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token",
+            "description": "Alias alternativo para id_token"
+          }
+        },
+        "type": "object",
+        "title": "GoogleAuthRequest"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "PlacaConsultarRequest": {
+        "properties": {
+          "placa": {
+            "type": "string",
+            "maxLength": 20,
+            "minLength": 2,
+            "title": "Placa",
+            "examples": [
+              "2481-KLM"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "placa"
+        ],
+        "title": "PlacaConsultarRequest"
+      },
+      "RecargaRequest": {
+        "properties": {
+          "monto": {
+            "type": "number",
+            "maximum": 50000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Monto"
+          }
+        },
+        "type": "object",
+        "required": [
+          "monto"
+        ],
+        "title": "RecargaRequest"
+      },
+      "TarifaUpsert": {
+        "properties": {
+          "categoria": {
+            "type": "string",
+            "pattern": "^(moto|auto|minibus|camion|bus)$",
+            "title": "Categoria"
+          },
+          "ejes": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 2.0,
+            "title": "Ejes"
+          },
+          "monto": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Monto"
+          }
+        },
+        "type": "object",
+        "required": [
+          "categoria",
+          "ejes",
+          "monto"
+        ],
+        "title": "TarifaUpsert"
+      },
+      "UsuarioCreate": {
+        "properties": {
+          "email_google": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 5,
+            "title": "Email Google"
+          },
+          "nombre": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 2,
+            "title": "Nombre"
+          },
+          "rol": {
+            "type": "string",
+            "pattern": "^(admin|operador)$",
+            "title": "Rol",
+            "default": "operador"
+          },
+          "activo": {
+            "type": "boolean",
+            "title": "Activo",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "email_google",
+          "nombre"
+        ],
+        "title": "UsuarioCreate"
+      },
+      "UsuarioToggle": {
+        "properties": {
+          "rol": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(admin|operador)$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rol"
+          },
+          "activo": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Activo"
+          }
+        },
+        "type": "object",
+        "title": "UsuarioToggle"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VehiculoCreate": {
+        "properties": {
+          "placa": {
+            "type": "string",
+            "maxLength": 20,
+            "minLength": 4,
+            "title": "Placa"
+          },
+          "propietario": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 2,
+            "title": "Propietario"
+          },
+          "categoria": {
+            "type": "string",
+            "pattern": "^(moto|auto|minibus|camion|bus)$",
+            "title": "Categoria"
+          },
+          "ejes": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 2.0,
+            "title": "Ejes",
+            "default": 2
+          },
+          "saldo": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Saldo",
+            "default": 50.0
+          },
+          "activo": {
+            "type": "boolean",
+            "title": "Activo",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "placa",
+          "propietario",
+          "categoria"
+        ],
+        "title": "VehiculoCreate"
+      },
+      "VehiculoUpdate": {
+        "properties": {
+          "propietario": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Propietario"
+          },
+          "categoria": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(moto|auto|minibus|camion|bus)$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Categoria"
+          },
+          "ejes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10.0,
+                "minimum": 2.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ejes"
+          },
+          "saldo": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Saldo"
+          },
+          "activo": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Activo"
+          }
+        },
+        "type": "object",
+        "title": "VehiculoUpdate"
+      }
+    }
+  }
+}

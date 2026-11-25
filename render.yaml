@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: peaje-iam811-web
+    runtime: python
+    rootDir: web
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: TIMEZONE_OFFSET
+        value: "-4"
+      - key: QWEN_BASE_URL
+        value: https://openrouter.ai/api/v1
+      - key: QWEN_MODEL
+        value: qwen/qwen-2.5-72b-instruct
+      - key: ADMIN_EMAILS
+        value: doc.alvaro.pinto.ma@unifranz.edu.bo,cristopherrodriguez1510@gmail.com
+      - key: DATABASE_URL
+        sync: false
+      - key: INFERENCE_URL
+        sync: false
+      - key: INFERENCE_API_TOKEN
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_ANDROID_CLIENT_ID
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: QWEN_API_KEY
+        sync: false

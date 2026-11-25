@@ -1,0 +1,21 @@
+name: peaje-entrenamiento
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11.11
+  - pip=25.0
+  - pip:
+      - torch==2.6.0
+      - torchvision==0.21.0
+      - ultralytics==8.3.107
+      - roboflow==1.1.60
+      - onnxruntime==1.21.0
+      - fast-plate-ocr==0.3.2
+      - easyocr==1.7.2
+      - opencv-python-headless==4.11.0.86
+      - numpy==1.26.4
+      - pandas==2.2.3
+      - matplotlib==3.10.1
+      - pyyaml==6.0.2
+      - scipy==1.15.2

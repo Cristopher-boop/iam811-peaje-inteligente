@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Estado del Sistema — Control de Peaje{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h2 class="text-2xl font-bold text-white">Estado del Endpoint de Inferencia</h2>
+    <p class="text-sm text-slate-400">Verificación en vivo de <code>INFERENCE_URL</code> (RunPod o Colab).</p>
+  </div>
+  <button onclick="location.reload()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold">Reintentar /health</button>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div class="bg-slate-900 border {{ 'border-emerald-500/40' if salud.ok else 'border-rose-500/40' }} rounded-xl p-6">
+    <div class="text-xs uppercase font-semibold text-slate-400">Conexión RunPod / Colab</div>
+    <div class="mt-2 flex items-center gap-3">
+      <span class="w-3 h-3 rounded-full {{ 'bg-emerald-400' if salud.ok else 'bg-rose-500' }}"></span>
+      <span class="text-xl font-bold text-white">{{ 'EN LÍNEA' if salud.ok else 'SIN RESPUESTA' }}</span>
+    </div>
+    <div class="mt-4 space-y-1 text-sm text-slate-300">
+      <div><strong>URL configurada:</strong> <code>{{ inference_url }}</code></div>
+      {% if salud.latencia_ms %}<div><strong>Latencia /health:</strong> {{ salud.latencia_ms }} ms</div>{% endif %}
+      {% if salud.ok and salud.detalle %}
+        <div><strong>GPU:</strong> {{ salud.detalle.gpu or salud.detalle.dispositivo }}</div>
+        <div><strong>Pod ID:</strong> {{ salud.detalle.runpod_pod_id or 'N/A' }}</div>
+      {% else %}
+        <div class="text-rose-300 text-xs mt-2">{{ salud.detalle }}</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+    <div class="text-xs uppercase font-semibold text-slate-400 mb-3">Estado de Modelos y Agente</div>
+    {% if salud.ok and salud.detalle and salud.detalle.modelos %}
+      <ul class="space-y-2 text-sm">
+        <li>M1 Detector de placas (ONNX): <strong class="text-emerald-400">{{ 'OK' if salud.detalle.modelos.m1_deteccion else 'NO' }}</strong></li>
+        <li>M1 OCR (fast-plate-ocr / EasyOCR): <strong class="text-emerald-400">{{ 'OK' if (salud.detalle.modelos.m1_fast_ocr or salud.detalle.modelos.m1_easyocr) else 'NO' }}</strong></li>
+        <li>M2 Segmentación (YOLO-seg): <strong class="{{ 'text-emerald-400' if salud.detalle.modelos.m2_entrenado_propio else 'text-amber-400' }}">{{ 'Propio entrenado' if salud.detalle.modelos.m2_entrenado_propio else 'Respaldo COCO (sube best_m2_seg.pt)' }}</strong></li>
+        <li>M3 Keypoints ruedas (YOLO-pose): <strong class="{{ 'text-emerald-400' if salud.detalle.modelos.m3_entrenado_propio else 'text-rose-400' }}">{{ 'Propio entrenado' if salud.detalle.modelos.m3_entrenado_propio else 'Pendiente best_m3_pose.pt' }}</strong></li>
+      </ul>
+    {% else %}
+      <p class="text-sm text-slate-400">No se pudo leer el estado de los modelos remotos.</p>
+    {% endif %}
+    <div class="mt-4 pt-4 border-t border-slate-800 text-sm">
+      <strong>Agente LLM (Qwen Web):</strong>
+      <span class="{{ 'text-emerald-400' if qwen_configurado else 'text-amber-300' }}">
+        {{ qwen_model if qwen_configurado else 'Sin QWEN_API_KEY (usando respaldo determinístico)' }}
+      </span>
+    </div>
+  </div>
+</div>
+{% endblock %}

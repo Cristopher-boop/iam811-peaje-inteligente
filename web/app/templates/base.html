@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Control de Peaje Inteligente — IAM-811{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col md:flex-row">
+  <aside class="w-full md:w-64 bg-slate-900 border-b md:border-b-0 md:border-r border-slate-800 flex flex-col justify-between">
+    <div>
+      <div class="px-5 py-4 border-b border-slate-800">
+        <div class="text-xs uppercase tracking-wider text-emerald-400 font-semibold">IAM-811 · Peaje AI</div>
+        <h1 class="text-lg font-bold text-white">Control Inteligente</h1>
+      </div>
+      <nav class="p-3 space-y-1 text-sm">
+        <a href="/" class="flex items-center gap-2 px-3 py-2 rounded-lg {{ 'bg-emerald-600/20 text-emerald-300 font-semibold' if pagina == 'panel' else 'text-slate-300 hover:bg-slate-800' }}">
+          <span>Panel en tiempo real</span>
+        </a>
+        <a href="/vehiculos" class="flex items-center gap-2 px-3 py-2 rounded-lg {{ 'bg-emerald-600/20 text-emerald-300 font-semibold' if pagina == 'vehiculos' else 'text-slate-300 hover:bg-slate-800' }}">
+          <span>Vehículos y Tarifas</span>
+        </a>
+        <a href="/pasos" class="flex items-center gap-2 px-3 py-2 rounded-lg {{ 'bg-emerald-600/20 text-emerald-300 font-semibold' if pagina == 'pasos' else 'text-slate-300 hover:bg-slate-800' }}">
+          <span>Historial de Pasos</span>
+        </a>
+        <a href="/alertas" class="flex items-center gap-2 px-3 py-2 rounded-lg {{ 'bg-emerald-600/20 text-emerald-300 font-semibold' if pagina == 'alertas' else 'text-slate-300 hover:bg-slate-800' }}">
+          <span>Alertas</span>
+        </a>
+        <a href="/chat" class="flex items-center gap-2 px-3 py-2 rounded-lg {{ 'bg-emerald-600/20 text-emerald-300 font-semibold' if pagina == 'chat' else 'text-slate-300 hover:bg-slate-800' }}">
+          <span>Chat Agente</span>
+        </a>
+        <a href="/estado" class="flex items-center gap-2 px-3 py-2 rounded-lg {{ 'bg-emerald-600/20 text-emerald-300 font-semibold' if pagina == 'estado' else 'text-slate-300 hover:bg-slate-800' }}">
+          <span>Estado Inferencia</span>
+        </a>
+        <a href="/docs" target="_blank" class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+          <span>API Swagger ↗</span>
+        </a>
+      </nav>
+    </div>
+    <div class="p-4 border-t border-slate-800 text-xs">
+      <div class="font-semibold text-white truncate">{{ user.nombre }}</div>
+      <div class="text-slate-400 truncate">{{ user.email_google }}</div>
+      <div class="mt-2 flex items-center justify-between">
+        <span class="px-2 py-0.5 rounded bg-slate-800 text-emerald-300 uppercase font-semibold">{{ user.rol }}</span>
+        <a href="/logout" class="text-rose-400 hover:text-rose-300">Cerrar sesión</a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="flex-1 p-5 md:p-8 overflow-y-auto">
+    {% block content %}{% endblock %}
+  </main>
+
+  <div id="evidencia-modal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onclick="this.classList.add('hidden')">
+    <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-3xl w-full p-4" onclick="event.stopPropagation()">
+      <div class="flex justify-between items-center mb-3">
+        <h3 id="evidencia-titulo" class="font-semibold text-white">Imagen de evidencia</h3>
+        <button onclick="document.getElementById('evidencia-modal').classList.add('hidden')" class="text-slate-400 hover:text-white text-sm">Cerrar ✕</button>
+      </div>
+      <img id="evidencia-img" src="" alt="Evidencia" class="w-full max-h-[75vh] object-contain rounded-lg bg-black">
+    </div>
+  </div>
+
+  <script>
+    function verEvidencia(url, titulo) {
+      if (!url) return;
+      document.getElementById('evidencia-titulo').textContent = titulo || 'Imagen de evidencia';
+      document.getElementById('evidencia-img').src = url;
+      document.getElementById('evidencia-modal').classList.remove('hidden');
+    }
+    function badgeEstado(estado) {
+      const map = {
+        'AUTORIZADO': 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+        'NO_REGISTRADA': 'bg-rose-500/20 text-rose-300 border-rose-500/40',
+        'SIN_SALDO': 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+        'INACTIVO': 'bg-orange-500/20 text-orange-300 border-orange-500/40',
+        'ILEGIBLE': 'bg-slate-700 text-slate-300 border-slate-600'
+      };
+      return map[estado] || 'bg-slate-700 text-slate-200 border-slate-600';
+    }
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Historial de Pasos — Control de Peaje{% endblock %}
+
+{% block content %}
+<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+  <div>
+    <h2 class="text-2xl font-bold text-white">Historial de Pasos</h2>
+    <p class="text-sm text-slate-400">Registro completo con imagen de evidencia anotada, categoría, ejes y tarifa.</p>
+  </div>
+  <input id="filtro-pasos" type="text" placeholder="Filtrar por placa o estado..." onkeyup="filtrarPasos()"
+         class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm w-64">
+</div>
+
+<div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm text-left">
+      <thead class="bg-slate-950/60 text-slate-400 text-xs uppercase">
+        <tr>
+          <th class="px-4 py-3">Evidencia</th>
+          <th class="px-4 py-3">Placa leída</th>
+          <th class="px-4 py-3">Normalizada</th>
+          <th class="px-4 py-3">Conf. OCR</th>
+          <th class="px-4 py-3">Categoría / Ejes</th>
+          <th class="px-4 py-3">Monto</th>
+          <th class="px-4 py-3">Caseta</th>
+          <th class="px-4 py-3">Estado</th>
+          <th class="px-4 py-3">Fecha</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-800">
+        {% for p in pasos %}
+        <tr class="paso-row hover:bg-slate-800/40" data-search="{{ p.placa_normalizada }} {{ p.placa_leida }} {{ p.estado }} {{ p.categoria_detectada }}">
+          <td class="px-4 py-2.5">
+            {% if p.imagen_url %}
+              <button onclick="verEvidencia('{{ p.imagen_url }}', 'Paso #{{ p.id }} · {{ p.placa_normalizada or p.placa_leida }}')">
+                <img src="{{ p.imagen_url }}" class="w-16 h-11 object-cover rounded border border-slate-700">
+              </button>
+            {% else %}
+              <span class="text-xs text-slate-500">N/A</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-2.5 font-mono text-slate-300">{{ p.placa_leida }}</td>
+          <td class="px-4 py-2.5 font-mono font-bold text-white">{{ p.placa_normalizada or '-' }}</td>
+          <td class="px-4 py-2.5">{{ '%.1f%%'|format(p.confianza_ocr * 100) if p.confianza_ocr is not none else '-' }}</td>
+          <td class="px-4 py-2.5 capitalize">{{ p.categoria_detectada or '-' }} · {{ p.ejes_detectados if p.ejes_detectados is not none else 'N/D' }} ejes</td>
+          <td class="px-4 py-2.5 font-semibold">{{ '%.2f'|format(p.monto) }} Bs</td>
+          <td class="px-4 py-2.5 text-slate-300">{{ p.caseta_nombre }}</td>
+          <td class="px-4 py-2.5">
+            <span class="px-2 py-0.5 rounded border text-xs font-semibold {{ 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' if p.estado == 'AUTORIZADO' else ('bg-rose-500/20 text-rose-300 border-rose-500/40' if p.estado == 'NO_REGISTRADA' else 'bg-amber-500/20 text-amber-300 border-amber-500/40') }}">
+              {{ p.estado }}
+            </span>
+          </td>
+          <td class="px-4 py-2.5 text-xs text-slate-400">{{ p.fecha_local }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function filtrarPasos() {
+    const q = document.getElementById('filtro-pasos').value.toLowerCase();
+    document.querySelectorAll('.paso-row').forEach(r => {
+      r.style.display = r.dataset.search.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+</script>
+{% endblock %}

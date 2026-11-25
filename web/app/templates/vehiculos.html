@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+{% block title %}Vehículos y Tarifas — Control de Peaje{% endblock %}
+
+{% block content %}
+<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+  <div>
+    <h2 class="text-2xl font-bold text-white">Gestión de Vehículos, Tarifas y Accesos</h2>
+    <p class="text-sm text-slate-400">Padrón vehicular ({{ vehiculos|length }} registrados), matriz de tarifas y lista blanca Google.</p>
+  </div>
+  {% if user.rol == 'admin' %}
+  <button onclick="abrirModalNuevo()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-sm font-semibold text-white">
+    + Nuevo vehículo
+  </button>
+  {% endif %}
+</div>
+
+<!-- Vehiculos -->
+<div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden mb-8">
+  <div class="px-5 py-3 border-b border-slate-800 flex items-center justify-between">
+    <h3 class="font-semibold text-white">Vehículos registrados</h3>
+    <input id="filtro-veh" type="text" placeholder="Buscar placa o propietario..." onkeyup="filtrarVehiculos()"
+           class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs w-64">
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm text-left" id="tabla-vehiculos">
+      <thead class="bg-slate-950/60 text-slate-400 text-xs uppercase">
+        <tr>
+          <th class="px-4 py-3">Placa</th>
+          <th class="px-4 py-3">Propietario</th>
+          <th class="px-4 py-3">Categoría</th>
+          <th class="px-4 py-3">Ejes</th>
+          <th class="px-4 py-3">Saldo</th>
+          <th class="px-4 py-3">Estado</th>
+          {% if user.rol == 'admin' %}<th class="px-4 py-3 text-right">Acciones</th>{% endif %}
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-800">
+        {% for v in vehiculos %}
+        <tr class="veh-row hover:bg-slate-800/40" data-search="{{ v.placa }} {{ v.propietario }} {{ v.categoria }}">
+          <td class="px-4 py-2.5 font-mono font-bold text-white">{{ v.placa }}</td>
+          <td class="px-4 py-2.5">{{ v.propietario }}</td>
+          <td class="px-4 py-2.5 capitalize">{{ v.categoria }}</td>
+          <td class="px-4 py-2.5">{{ v.ejes }}</td>
+          <td class="px-4 py-2.5 font-semibold {{ 'text-rose-400' if v.saldo <= 0 else 'text-emerald-400' }}">{{ '%.2f'|format(v.saldo) }} Bs</td>
+          <td class="px-4 py-2.5">
+            <span class="px-2 py-0.5 rounded text-xs {{ 'bg-emerald-500/20 text-emerald-300' if v.activo else 'bg-slate-700 text-slate-400' }}">
+              {{ 'Activo' if v.activo else 'Inactivo' }}
+            </span>
+          </td>
+          {% if user.rol == 'admin' %}
+          <td class="px-4 py-2.5 text-right space-x-2">
+            <button onclick="recargar({{ v.id }}, '{{ v.placa }}')" class="text-xs text-emerald-400 hover:underline">Recargar</button>
+            <button onclick="editarVeh({{ v.id }}, '{{ v.propietario }}', '{{ v.categoria }}', {{ v.ejes }}, {{ v.saldo }}, {{ 'true' if v.activo else 'false' }})" class="text-xs text-sky-400 hover:underline">Editar</button>
+            <button onclick="eliminarVeh({{ v.id }}, '{{ v.placa }}')" class="text-xs text-rose-400 hover:underline">Eliminar</button>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Tarifas y Casetas -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+  <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+    <h3 class="font-semibold text-white mb-3">Tarifas por categoría y ejes</h3>
+    <table class="w-full text-sm">
+      <thead class="text-xs text-slate-400 uppercase border-b border-slate-800">
+        <tr><th class="py-2 text-left">Categoría</th><th class="py-2 text-left">Ejes</th><th class="py-2 text-right">Monto</th></tr>
+      </thead>
+      <tbody class="divide-y divide-slate-800">
+        {% for t in tarifas %}
+        <tr><td class="py-2 capitalize">{{ t.categoria }}</td><td class="py-2">{{ t.ejes }}</td><td class="py-2 text-right font-semibold">{{ '%.2f'|format(t.monto) }} Bs</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if user.rol == 'admin' %}
+    <form onsubmit="guardarTarifa(event)" class="mt-4 flex flex-wrap gap-2">
+      <select id="tarifa-cat" class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-xs">
+        <option value="moto">moto</option><option value="auto">auto</option><option value="minibus">minibus</option><option value="camion">camion</option><option value="bus">bus</option>
+      </select>
+      <input id="tarifa-ejes" type="number" min="2" max="10" value="2" class="w-20 bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-xs" placeholder="Ejes">
+      <input id="tarifa-monto" type="number" step="0.5" min="1" value="10" class="w-24 bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-xs" placeholder="Bs">
+      <button class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold">Guardar tarifa</button>
+    </form>
+    {% endif %}
+  </div>
+
+  <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+    <h3 class="font-semibold text-white mb-3">Casetas configuradas</h3>
+    <ul class="space-y-2 text-sm mb-4">
+      {% for c in casetas %}
+      <li class="p-3 rounded-lg bg-slate-950 border border-slate-800 flex justify-between">
+        <div><div class="font-semibold text-white">{{ c.nombre }}</div><div class="text-xs text-slate-400">{{ c.ubicacion }}</div></div>
+        <span class="text-xs text-emerald-400">ID {{ c.id }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% if user.rol == 'admin' %}
+    <form onsubmit="crearCaseta(event)" class="flex flex-wrap gap-2">
+      <input id="caseta-nombre" type="text" required placeholder="Nombre caseta" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs">
+      <input id="caseta-ubicacion" type="text" required placeholder="Ubicación" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs">
+      <button class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold">Agregar</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+{% if user.rol == 'admin' %}
+<!-- Lista blanca usuarios Google -->
+<div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+  <h3 class="font-semibold text-white mb-3">Lista blanca de cuentas Google autorizadas</h3>
+  <form onsubmit="crearUsuario(event)" class="flex flex-wrap gap-2 mb-4">
+    <input id="usr-email" type="email" required placeholder="correo@gmail.com" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs">
+    <input id="usr-nombre" type="text" required placeholder="Nombre completo" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs">
+    <select id="usr-rol" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs">
+      <option value="operador">Operador</option><option value="admin">Administrador</option>
+    </select>
+    <button class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white">Autorizar Google</button>
+  </form>
+  <table class="w-full text-sm">
+    <thead class="text-xs text-slate-400 uppercase border-b border-slate-800">
+      <tr><th class="py-2 text-left">Correo Google</th><th class="py-2 text-left">Nombre</th><th class="py-2 text-left">Rol</th><th class="py-2 text-right">Estado</th></tr>
+    </thead>
+    <tbody class="divide-y divide-slate-800">
+      {% for u in usuarios %}
+      <tr>
+        <td class="py-2 font-mono text-xs">{{ u.email_google }}</td>
+        <td class="py-2">{{ u.nombre }}</td>
+        <td class="py-2 uppercase text-xs font-semibold">{{ u.rol }}</td>
+        <td class="py-2 text-right">
+          <button onclick="toggleUsuario({{ u.id }}, {{ 'false' if u.activo else 'true' }})" class="text-xs {{ 'text-emerald-400' if u.activo else 'text-rose-400' }} hover:underline">
+            {{ 'Activo (desactivar)' if u.activo else 'Inactivo (activar)' }}
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- Modal vehiculo -->
+<div id="veh-modal" class="hidden fixed inset-0 bg-black/80 z-40 flex items-center justify-center p-4">
+  <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full p-5">
+    <h3 id="veh-modal-title" class="font-bold text-white mb-4">Nuevo vehículo</h3>
+    <form onsubmit="guardarVehiculo(event)" class="space-y-3 text-sm">
+      <input type="hidden" id="veh-id">
+      <div id="veh-placa-wrap">
+        <label class="block text-xs text-slate-400 mb-1">Placa</label>
+        <input id="veh-placa" type="text" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 uppercase" placeholder="2481KLM">
+      </div>
+      <div>
+        <label class="block text-xs text-slate-400 mb-1">Propietario</label>
+        <input id="veh-prop" type="text" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2">
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Categoría</label>
+          <select id="veh-cat" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2">
+            <option value="moto">moto</option><option value="auto">auto</option><option value="minibus">minibus</option><option value="camion">camion</option><option value="bus">bus</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Ejes</label>
+          <input id="veh-ejes" type="number" min="2" max="10" value="2" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2">
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Saldo (Bs)</label>
+          <input id="veh-saldo" type="number" step="0.5" min="0" value="100" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2">
+        </div>
+        <div class="flex items-end pb-2">
+          <label class="flex items-center gap-2 text-xs text-slate-300">
+            <input id="veh-activo" type="checkbox" checked> Vehículo activo
+          </label>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-3">
+        <button type="button" onclick="document.getElementById('veh-modal').classList.add('hidden')" class="px-3 py-2 rounded-lg bg-slate-800 text-xs">Cancelar</button>
+        <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function filtrarVehiculos() {
+    const q = document.getElementById('filtro-veh').value.toLowerCase();
+    document.querySelectorAll('.veh-row').forEach(r => {
+      r.style.display = r.dataset.search.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+  function abrirModalNuevo() {
+    document.getElementById('veh-id').value = '';
+    document.getElementById('veh-modal-title').textContent = 'Nuevo vehículo';
+    document.getElementById('veh-placa-wrap').classList.remove('hidden');
+    document.getElementById('veh-placa').required = true;
+    document.getElementById('veh-placa').value = '';
+    document.getElementById('veh-prop').value = '';
+    document.getElementById('veh-cat').value = 'auto';
+    document.getElementById('veh-ejes').value = 2;
+    document.getElementById('veh-saldo').value = 100;
+    document.getElementById('veh-activo').checked = true;
+    document.getElementById('veh-modal').classList.remove('hidden');
+  }
+  function editarVeh(id, prop, cat, ejes, saldo, activo) {
+    document.getElementById('veh-id').value = id;
+    document.getElementById('veh-modal-title').textContent = 'Editar vehículo';
+    document.getElementById('veh-placa-wrap').classList.add('hidden');
+    document.getElementById('veh-placa').required = false;
+    document.getElementById('veh-prop').value = prop;
+    document.getElementById('veh-cat').value = cat;
+    document.getElementById('veh-ejes').value = ejes;
+    document.getElementById('veh-saldo').value = saldo;
+    document.getElementById('veh-activo').checked = activo;
+    document.getElementById('veh-modal').classList.remove('hidden');
+  }
+  async function guardarVehiculo(e) {
+    e.preventDefault();
+    const id = document.getElementById('veh-id').value;
+    const body = {
+      propietario: document.getElementById('veh-prop').value,
+      categoria: document.getElementById('veh-cat').value,
+      ejes: Number(document.getElementById('veh-ejes').value),
+      saldo: Number(document.getElementById('veh-saldo').value),
+      activo: document.getElementById('veh-activo').checked,
+    };
+    let url = '/api/v1/vehiculos', method = 'POST';
+    if (id) { url += '/' + id; method = 'PUT'; }
+    else { body.placa = document.getElementById('veh-placa').value; }
+    const r = await fetch(url, { method, headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+    if (!r.ok) { alert((await r.json()).detail || 'Error'); return; }
+    location.reload();
+  }
+  async function recargar(id, placa) {
+    const monto = prompt('Monto a recargar en Bs para ' + placa + ':', '50');
+    if (!monto) return;
+    const r = await fetch(`/api/v1/vehiculos/${id}/recargar`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ monto: Number(monto) }) });
+    if (r.ok) location.reload();
+  }
+  async function eliminarVeh(id, placa) {
+    if (!confirm('¿Eliminar vehículo ' + placa + '?')) return;
+    const r = await fetch(`/api/v1/vehiculos/${id}`, { method: 'DELETE' });
+    if (r.ok) location.reload();
+  }
+  async function guardarTarifa(e) {
+    e.preventDefault();
+    const r = await fetch('/api/v1/tarifas', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        categoria: document.getElementById('tarifa-cat').value,
+        ejes: Number(document.getElementById('tarifa-ejes').value),
+        monto: Number(document.getElementById('tarifa-monto').value)
+      })
+    });
+    if (r.ok) location.reload();
+  }
+  async function crearCaseta(e) {
+    e.preventDefault();
+    const r = await fetch('/api/v1/casetas', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ nombre: document.getElementById('caseta-nombre').value, ubicacion: document.getElementById('caseta-ubicacion').value })
+    });
+    if (r.ok) location.reload();
+  }
+  async function crearUsuario(e) {
+    e.preventDefault();
+    const r = await fetch('/api/v1/usuarios', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        email_google: document.getElementById('usr-email').value,
+        nombre: document.getElementById('usr-nombre').value,
+        rol: document.getElementById('usr-rol').value
+      })
+    });
+    if (!r.ok) { alert((await r.json()).detail || 'Error'); return; }
+    location.reload();
+  }
+  async function toggleUsuario(id, activo) {
+    const r = await fetch(`/api/v1/usuarios/${id}`, { method: 'PATCH', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ activo }) });
+    if (r.ok) location.reload();
+  }
+</script>
+{% endblock %}

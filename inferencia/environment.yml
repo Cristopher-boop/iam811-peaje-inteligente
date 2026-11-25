@@ -1,0 +1,21 @@
+name: peaje-inferencia
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11.11
+  - pip=25.0
+  - pip:
+      - fastapi==0.115.12
+      - uvicorn[standard]==0.34.0
+      - python-multipart==0.0.20
+      - ultralytics==8.3.107
+      - onnxruntime-gpu==1.21.0
+      - fast-plate-ocr==0.3.2
+      - easyocr==1.7.2
+      - opencv-python-headless==4.11.0.86
+      - numpy==1.26.4
+      - torch==2.6.0
+      - torchvision==0.21.0
+      - pillow==11.1.0
+      - pyyaml==6.0.2

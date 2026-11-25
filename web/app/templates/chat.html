@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Chat Agente Conversacional — Control de Peaje{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto flex flex-col h-[calc(100vh-5rem)]">
+  <div class="mb-4">
+    <h2 class="text-2xl font-bold text-white">Agente Conversacional de Placas (Qwen + BD)</h2>
+    <p class="text-sm text-slate-400">Consulta cualquier placa por texto o adjuntando una foto. Responde solo con datos reales del sistema.</p>
+    <div class="flex flex-wrap gap-2 mt-3 text-xs">
+      <button onclick="usarEjemplo('Consulta el estado de la placa 2481-KLM')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300">Registrada y con paso (2481KLM)</button>
+      <button onclick="usarEjemplo('¿Qué estado tiene la placa 1895ABC?')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300">Registrada sin paso (1895ABC)</button>
+      <button onclick="usarEjemplo('Verifica la placa 8888-EVD')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-rose-300">Identificada no registrada (8888EVD)</button>
+      <button onclick="usarEjemplo('Consulta la placa 24B1KLM')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300">Confusión OCR (24B1KLM)</button>
+      <button onclick="usarEjemplo('Estado de 7777NNN')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">No existe (7777NNN)</button>
+    </div>
+  </div>
+
+  <div id="chat-messages" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl p-4 overflow-y-auto space-y-4 mb-4">
+    <div class="bg-slate-800/80 rounded-xl p-3.5 max-w-2xl text-sm text-slate-200">
+      Hola {{ user.nombre }}. Escribe una placa vehicular o sube una foto para verificar su estado en tiempo real.
+    </div>
+  </div>
+
+  <form id="chat-form" class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2">
+    <div id="preview-wrap" class="hidden flex items-center gap-3 text-xs text-slate-300 bg-slate-950 p-2 rounded-lg">
+      <img id="img-preview" class="h-12 rounded">
+      <span id="img-name" class="flex-1 truncate"></span>
+      <button type="button" onclick="limpiarImagen()" class="text-rose-400">Quitar ✕</button>
+    </div>
+    <div class="flex gap-2">
+      <label class="px-3 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 cursor-pointer text-xs font-semibold text-slate-200 flex items-center">
+        📷 Foto
+        <input id="chat-file" type="file" accept="image/*" class="hidden" onchange="mostrarPreview(this)">
+      </label>
+      <input id="chat-input" type="text" placeholder="Escribe una placa o consulta (ej. 2481-KLM)..."
+             class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+      <button type="submit" id="chat-btn" class="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-sm font-semibold text-white">
+        Enviar
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const box = document.getElementById('chat-messages');
+  const input = document.getElementById('chat-input');
+  const fileInput = document.getElementById('chat-file');
+
+  function usarEjemplo(txt) {
+    input.value = txt;
+    input.focus();
+  }
+  function mostrarPreview(el) {
+    if (!el.files || !el.files[0]) return;
+    document.getElementById('img-name').textContent = el.files[0].name;
+    document.getElementById('img-preview').src = URL.createObjectURL(el.files[0]);
+    document.getElementById('preview-wrap').classList.remove('hidden');
+  }
+  function limpiarImagen() {
+    fileInput.value = '';
+    document.getElementById('preview-wrap').classList.add('hidden');
+  }
+  function agregarBurbuja(html, esUsuario, imgSrc) {
+    const div = document.createElement('div');
+    div.className = esUsuario
+      ? 'ml-auto bg-emerald-700/40 border border-emerald-500/30 rounded-xl p-3.5 max-w-xl text-sm text-white'
+      : 'bg-slate-800/80 border border-slate-700 rounded-xl p-3.5 max-w-2xl text-sm text-slate-100 whitespace-pre-wrap';
+    if (imgSrc) {
+      const img = document.createElement('img');
+      img.src = imgSrc;
+      img.className = 'max-h-48 rounded-lg mb-2 border border-slate-700';
+      div.appendChild(img);
+    }
+    const span = document.createElement('div');
+    span.innerHTML = html;
+    div.appendChild(span);
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  document.getElementById('chat-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = input.value.trim();
+    const file = fileInput.files[0];
+    if (!msg && !file) return;
+
+    const previewSrc = file ? URL.createObjectURL(file) : null;
+    agregarBurbuja(msg || '(Imagen de placa)', true, previewSrc);
+    input.value = '';
+
+    const fd = new FormData();
+    fd.append('mensaje', msg);
+    if (file) fd.append('file', file);
+    limpiarImagen();
+
+    const btn = document.getElementById('chat-btn');
+    btn.disabled = true; btn.textContent = '...';
+    try {
+      const r = await fetch('/api/v1/agente/chat', { method: 'POST', body: fd });
+      const data = await r.json();
+      if (!r.ok) {
+        agregarBurbuja('Error: ' + (data.detail || r.status), false);
+      } else {
+        const annot = data.ocr && data.ocr.imagen_anotada ? data.ocr.imagen_anotada : null;
+        const badge = data.estado_sistema ? `<div class="text-xs font-semibold text-emerald-300 mb-1">Estado: ${data.estado_sistema} · (${data.modelo_llm})</div>` : '';
+        const txt = (data.respuesta || '').replace(/</g, '&lt;').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        agregarBurbuja(badge + txt, false, annot);
+      }
+    } finally {
+      btn.disabled = false; btn.textContent = 'Enviar';
+    }
+  });
+</script>
+{% endblock %}

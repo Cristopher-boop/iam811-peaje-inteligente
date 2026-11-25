@@ -1,0 +1,52 @@
+# Secretos y configuracion local (NUNCA subir .env real)
+.env
+.env.*
+!.env.example
+client_secret*.json
+service-account*.json
+*.pem
+*.key
+
+# Entornos Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.conda/
+
+# Datasets pesados y artefactos temporales de entrenamiento
+datasets/
+runs/
+*.zip
+*.tar.gz
+recursos_h4/placas-web/python/placas/modelo/easyocr/
+inferencia/models/easyocr/
+
+# Flutter / Android
+movil/.dart_tool/
+movil/.packages
+movil/build/
+movil/android/.gradle/
+movil/android/app/debug/
+movil/android/app/release/
+movil/android/local.properties
+movil/android/key.properties
+*.apk
+*.aab
+*.jks
+*.keystore
+
+# Bases de datos locales de prueba
+*.db
+*.sqlite
+*.sqlite3
+
+# Carpeta de material base del docente (se mantiene local, fuera del repo limpio)
+recursos_h4/
+
+# Logs y OS
+*.log
+.DS_Store
+Thumbs.db
