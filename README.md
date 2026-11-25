@@ -33,8 +33,8 @@ flowchart TD
 
 | Recurso | Enlace |
 | :--- | :--- |
-| **Aplicación Web (Subdominio HTTPS)** | `https://[COMPLETAR-SUBDOMINIO]` |
-| **Documentación Swagger / OpenAPI** | `https://[COMPLETAR-SUBDOMINIO]/docs` |
+| **Aplicación Web (Subdominio HTTPS)** | `https://peaje-iam811-web.onrender.com` |
+| **Documentación Swagger / OpenAPI** | `https://peaje-iam811-web.onrender.com/docs` |
 | **Endpoint de Inferencia (RunPod)** | `https://[POD_ID]-8000.proxy.runpod.net` |
 | **Dataset M2 en Roboflow (Segmentación)** | `https://app.roboflow.com/cristopher-diego-rodriguez-ayala/peaje-vehiculos-seg-6laub` |
 | **Dataset M3 en Roboflow (Keypoints ruedas)** | `https://app.roboflow.com/cristopher-diego-rodriguez-ayala/peaje-llantas-keypoints` |
