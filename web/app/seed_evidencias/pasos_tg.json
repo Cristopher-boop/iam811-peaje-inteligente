@@ -1,0 +1,92 @@
+[
+  {
+    "placa": "6699FAC",
+    "archivo_evidencia": "6699FAC.jpg",
+    "confianza_ocr": 1.0,
+    "categoria": "minibus",
+    "ejes": 2,
+    "monto": 5.0,
+    "latencia_ms": 52.2
+  },
+  {
+    "placa": "4214FZS",
+    "archivo_evidencia": "4214FZS.jpg",
+    "confianza_ocr": 1.0,
+    "categoria": "bus",
+    "ejes": 2,
+    "monto": 5.0,
+    "latencia_ms": 40.8
+  },
+  {
+    "placa": "5639ZCF",
+    "archivo_evidencia": "5639ZCF.jpg",
+    "confianza_ocr": 1.0,
+    "categoria": "minibus",
+    "ejes": 2,
+    "monto": 5.0,
+    "latencia_ms": 42.7
+  },
+  {
+    "placa": "2540GLR",
+    "archivo_evidencia": "2540GLR.jpg",
+    "confianza_ocr": 1.0,
+    "categoria": "minibus",
+    "ejes": 2,
+    "monto": 5.0,
+    "latencia_ms": 42.2
+  },
+  {
+    "placa": "2874REK",
+    "archivo_evidencia": "2874REK.jpg",
+    "confianza_ocr": 1.0,
+    "categoria": "camion",
+    "ejes": 2,
+    "monto": 5.0,
+    "latencia_ms": 51.1
+  },
+  {
+    "placa": "1212AZN",
+    "archivo_evidencia": "1212AZN.jpg",
+    "confianza_ocr": 0.999,
+    "categoria": "bus",
+    "ejes": 2,
+    "monto": 8.0,
+    "latencia_ms": 38.1
+  },
+  {
+    "placa": "5592SXK",
+    "archivo_evidencia": "5592SXK.jpg",
+    "confianza_ocr": 1.0,
+    "categoria": "bus",
+    "ejes": 2,
+    "monto": 5.0,
+    "latencia_ms": 42.2
+  },
+  {
+    "placa": "2006EGK",
+    "archivo_evidencia": "2006EGK.jpg",
+    "confianza_ocr": 1.0,
+    "categoria": "auto",
+    "ejes": 2,
+    "monto": 5.0,
+    "latencia_ms": 41.4
+  },
+  {
+    "placa": "2614DNX",
+    "archivo_evidencia": "2614DNX.jpg",
+    "confianza_ocr": 1.0,
+    "categoria": "minibus",
+    "ejes": 2,
+    "monto": 8.0,
+    "latencia_ms": 40.5
+  },
+  {
+    "placa": "4047CYP",
+    "archivo_evidencia": "4047CYP.jpg",
+    "confianza_ocr": 1.0,
+    "categoria": "bus",
+    "ejes": 2,
+    "monto": 8.0,
+    "latencia_ms": 56.4
+  }
+]

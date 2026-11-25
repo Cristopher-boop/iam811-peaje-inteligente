@@ -1,13 +1,15 @@
 """Inicializacion idempotente de datos semilla (docente admin, casetas, tarifas y >=20 vehiculos)."""
 from __future__ import annotations
 
+import json
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from app.models import Alerta, Caseta, Paso, Tarifa, Usuario, Vehiculo
+from app.models import Alerta, Caseta, Evidencia, Paso, Tarifa, Usuario, Vehiculo
 
 VEHICULOS_SEED = [
     ("2481KLM", "Carlos Mamani Quispe", "auto", 2, 120.0, True),
@@ -172,3 +174,43 @@ def seed_database(db: Session) -> None:
                 )
             )
             db.commit()
+
+    # 6. Pasos reales con imagen anotada de RunPod (lote Telegram)
+    ev_dir = Path(__file__).resolve().parent / "seed_evidencias"
+    tg_json = ev_dir / "pasos_tg.json"
+    if tg_json.exists():
+        caseta = db.scalar(select(Caseta).order_by(Caseta.id))
+        admin = db.scalar(select(Usuario).where(Usuario.rol == "admin").order_by(Usuario.id))
+        if caseta is not None:
+            ahora = datetime.now(timezone.utc)
+            items = json.loads(tg_json.read_text(encoding="utf-8"))
+            agregados = False
+            for idx, item in enumerate(items):
+                placa = item["placa"]
+                if db.scalar(select(Paso.id).where(Paso.placa_normalizada == placa).limit(1)) is not None:
+                    continue
+                img_path = ev_dir / item["archivo_evidencia"]
+                if not img_path.exists():
+                    continue
+                ev = Evidencia(contenido=img_path.read_bytes(), mime_type="image/jpeg")
+                db.add(ev)
+                db.flush()
+                db.add(
+                    Paso(
+                        placa_leida=placa,
+                        placa_normalizada=placa,
+                        confianza_ocr=item["confianza_ocr"],
+                        categoria_detectada=item["categoria"],
+                        ejes_detectados=item["ejes"],
+                        monto=item["monto"],
+                        caseta_id=caseta.id,
+                        usuario_id=admin.id if admin else None,
+                        imagen_url=f"/api/v1/evidencias/{ev.id}.jpg",
+                        estado="AUTORIZADO",
+                        latencia_ms=item["latencia_ms"],
+                        created_at=ahora - timedelta(minutes=max(1, len(items) - idx)),
+                    )
+                )
+                agregados = True
+            if agregados:
+                db.commit()
