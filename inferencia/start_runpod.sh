@@ -18,9 +18,9 @@ if [ ! -d ".venv" ]; then
   python3 -m venv --system-site-packages .venv
   source .venv/bin/activate
   pip install --no-cache-dir --upgrade pip
-  pip install --no-cache-dir fastapi==0.115.12 "uvicorn[standard]==0.34.0" python-multipart==0.0.20 \
-    ultralytics==8.3.107 onnxruntime-gpu==1.21.0 fast-plate-ocr==0.3.2 easyocr==1.7.2 \
-    opencv-python-headless==4.11.0.86 pyyaml==6.0.2
+  pip install --no-cache-dir fastapi==0.165.0 "uvicorn[standard]==0.54.0" python-multipart==0.0.34 \
+    ultralytics==8.4.218 onnxruntime-gpu==1.32.0 fast-plate-ocr==1.1.0 easyocr==1.7.2 \
+    opencv-python-headless==5.1.0.95 pyyaml==6.0.4
 else
   source .venv/bin/activate
 fi

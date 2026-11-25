@@ -1,0 +1,26 @@
+{
+  "m2": {
+    "project": "cristopher-diego-rodriguez-ayala/peaje-vehiculos-seg-6laub",
+    "version": 1,
+    "splits": {
+      "train": 1493,
+      "valid": 543
+    },
+    "instances": {
+      "minibus": 529,
+      "bus": 524,
+      "moto": 1007,
+      "camion": 843,
+      "auto": 3557
+    }
+  },
+  "m3": {
+    "project": "cristopher-diego-rodriguez-ayala/peaje-llantas-keypoints",
+    "version": 1,
+    "splits": {
+      "train": 390,
+      "valid": 146
+    },
+    "total_llantas": 1183
+  }
+}

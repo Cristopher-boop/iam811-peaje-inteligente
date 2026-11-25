@@ -143,7 +143,7 @@ python docs/diagnostico_entorno.py --servicio web_api --out docs/diagnostico_web
 cd movil
 flutter pub get
 flutter build apk --release \
-  --dart-define=BACKEND_URL=https://[COMPLETAR-SUBDOMINIO] \
-  --dart-define=GOOGLE_SERVER_CLIENT_ID=[COMPLETAR-WEB-CLIENT-ID]
+  --dart-define=BACKEND_URL=https://peaje-iam811-web.onrender.com \
+  --dart-define=GOOGLE_SERVER_CLIENT_ID=<GOOGLE_CLIENT_ID_WEB>
 ```
 El APK compilado queda en `movil/build/app/outputs/flutter-apk/app-release.apk`.

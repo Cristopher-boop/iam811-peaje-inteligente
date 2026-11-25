@@ -21,6 +21,9 @@ datasets/
 runs/
 *.zip
 *.tar.gz
+yolo11*.pt
+yoloe*.pt
+mobileclip*.ts
 recursos_h4/placas-web/python/placas/modelo/easyocr/
 inferencia/models/easyocr/
 

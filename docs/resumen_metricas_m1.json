@@ -1,0 +1,191 @@
+{
+  "modelo_deteccion": "yolo-v9-t-384-license-plates-end2end.onnx",
+  "modelo_ocr": "Hibrido (fast-plate-ocr cct_xs_v2_global + EasyOCR)",
+  "evaluacion_real_autopista": {
+    "dataset": "helmet-o8tke/vehicle-segmentation-pyt1u v1 (subconjunto valid/test con license-plate >=36px)",
+    "total_imagenes": 49,
+    "placas_detectadas": 47,
+    "tasa_deteccion_placa": 0.9592,
+    "tasa_lectura_fast_plate_ocr": 0.9184,
+    "tasa_lectura_easyocr": 0.1837,
+    "tasa_lectura_hibrido": 0.9184,
+    "confianza_deteccion_promedio": 0.7537,
+    "confianza_ocr_promedio": 0.6151,
+    "latencia_promedio_cpu_ms": 164.05,
+    "ejemplos": [
+      {
+        "archivo": "bus_vid2_frame_606_jpg.rf.4b01e4857ca624455e3bf5e3e991ef41.jpg",
+        "conf_det": 0.866,
+        "fast": "AE335",
+        "easy": "",
+        "hibrido": "AE335",
+        "ganador": "fast-plate-ocr",
+        "conf_ocr": 0.595
+      },
+      {
+        "archivo": "swift_vid5_frame_397_jpg.rf.370b19e447c1b80047d0d38fa088afef.jpg",
+        "conf_det": 0.88,
+        "fast": "1142VH4",
+        "easy": "",
+        "hibrido": "1142VH4",
+        "ganador": "fast-plate-ocr",
+        "conf_ocr": 0.496
+      },
+      {
+        "archivo": "van_vid11_frame_2241_jpg.rf.be0c835b03d771c16581081be38a4bf6.jpg",
+        "conf_det": 0.857,
+        "fast": "AJ46EEG",
+        "easy": "",
+        "hibrido": "AJ46EEG",
+        "ganador": "fast-plate-ocr",
+        "conf_ocr": 0.463
+      },
+      {
+        "archivo": "vid11_frame_1688_jpg.rf.082a72c9cd08f98507e1fca570776f58.jpg",
+        "conf_det": 0.362,
+        "fast": "VV44T",
+        "easy": "",
+        "hibrido": "VV44T",
+        "ganador": "fast-plate-ocr",
+        "conf_ocr": 0.615
+      },
+      {
+        "archivo": "vid1_frame_212_jpg.rf.203dc0a8d60d80f57b3cc6c50007da65.jpg",
+        "conf_det": 0.751,
+        "fast": "1J1CZ755",
+        "easy": "",
+        "hibrido": "1J1CZ755",
+        "ganador": "fast-plate-ocr",
+        "conf_ocr": 0.439
+      },
+      {
+        "archivo": "vid2_frame_1473_jpg.rf.b64740daad5032fd1257904e00b6ce57.jpg",
+        "conf_det": 0.844,
+        "fast": "W412C4444",
+        "easy": "ON",
+        "hibrido": "W412C4444",
+        "ganador": "fast-plate-ocr",
+        "conf_ocr": 0.623
+      },
+      {
+        "archivo": "vid2_frame_1500_jpg.rf.003e4b1c35ca857a58b81056ca706fcd.jpg",
+        "conf_det": 0.765,
+        "fast": "4753N441",
+        "easy": "",
+        "hibrido": "4753N441",
+        "ganador": "fast-plate-ocr",
+        "conf_ocr": 0.605
+      },
+      {
+        "archivo": "omni_vid11_frame_1688_jpg.rf.e7b5d2eca73e02c9d83a8e36f53cea80.jpg",
+        "conf_det": 0.855,
+        "fast": "NJ44Q11",
+        "easy": "",
+        "hibrido": "NJ44Q11",
+        "ganador": "fast-plate-ocr",
+        "conf_ocr": 0.555
+      }
+    ]
+  },
+  "evaluacion_sintetica_formato_bolivia": {
+    "nota": "Escenas controladas con franja 'BOLIVIA' y formato ^\\d{3,4}[A-Z]{3}$ para medir filtro de altura <60%",
+    "total_placas": 10,
+    "placas_detectadas": 10,
+    "exact_match_fast_plate_ocr": 0.9,
+    "exact_match_easyocr": 0.8,
+    "exact_match_hibrido": 0.9,
+    "cer_promedio_hibrido": 0.0143,
+    "ejemplos": [
+      {
+        "gt": "1895ABC",
+        "detectada": true,
+        "conf_det": 0.677,
+        "fast": "1895ABC",
+        "easy": "1895ABC",
+        "hibrido": "1895ABC",
+        "ganador": "fast-plate-ocr"
+      },
+      {
+        "gt": "2481KLM",
+        "detectada": true,
+        "conf_det": 0.379,
+        "fast": "2481KLM",
+        "easy": "2481KLM",
+        "hibrido": "2481KLM",
+        "ganador": "easyocr"
+      },
+      {
+        "gt": "5190TUV",
+        "detectada": true,
+        "conf_det": 0.456,
+        "fast": "5190TUV",
+        "easy": "5190TUV",
+        "hibrido": "5190TUV",
+        "ganador": "easyocr"
+      },
+      {
+        "gt": "4721RQP",
+        "detectada": true,
+        "conf_det": 0.627,
+        "fast": "4721RQP",
+        "easy": "4721RQP",
+        "hibrido": "4721RQP",
+        "ganador": "fast-plate-ocr"
+      },
+      {
+        "gt": "8342XYZ",
+        "detectada": true,
+        "conf_det": 0.657,
+        "fast": "8342XYZ",
+        "easy": "8342XYZ",
+        "hibrido": "8342XYZ",
+        "ganador": "fast-plate-ocr"
+      },
+      {
+        "gt": "9014DFG",
+        "detectada": true,
+        "conf_det": 0.717,
+        "fast": "9014DFG",
+        "easy": "9014DFG",
+        "hibrido": "9014DFG",
+        "ganador": "fast-plate-ocr"
+      },
+      {
+        "gt": "3120HJN",
+        "detectada": true,
+        "conf_det": 0.445,
+        "fast": "312OHJN",
+        "easy": "312OHJN",
+        "hibrido": "312OHJN",
+        "ganador": "fast-plate-ocr"
+      },
+      {
+        "gt": "6450BVC",
+        "detectada": true,
+        "conf_det": 0.535,
+        "fast": "6450BVC",
+        "easy": "645OBVC",
+        "hibrido": "6450BVC",
+        "ganador": "fast-plate-ocr"
+      },
+      {
+        "gt": "7201MNP",
+        "detectada": true,
+        "conf_det": 0.439,
+        "fast": "7201MNP",
+        "easy": "7201MNP",
+        "hibrido": "7201MNP",
+        "ganador": "fast-plate-ocr"
+      },
+      {
+        "gt": "987XYZ",
+        "detectada": true,
+        "conf_det": 0.336,
+        "fast": "987XYZ",
+        "easy": "987XYZ",
+        "hibrido": "987XYZ",
+        "ganador": "fast-plate-ocr"
+      }
+    ]
+  }
+}

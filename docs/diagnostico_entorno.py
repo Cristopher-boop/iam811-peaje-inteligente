@@ -36,8 +36,12 @@ def detectar_gestor_entorno() -> dict:
     conda_env = os.environ.get("CONDA_DEFAULT_ENV")
     conda_prefix = os.environ.get("CONDA_PREFIX")
     virtual_env = os.environ.get("VIRTUAL_ENV")
-    if conda_env:
+    has_conda_meta = os.path.isdir(os.path.join(sys.prefix, "conda-meta"))
+    if conda_env or conda_prefix or has_conda_meta:
         tipo = "mamba/conda"
+        if has_conda_meta and (not conda_prefix or os.path.normcase(os.path.abspath(sys.prefix)) != os.path.normcase(os.path.abspath(conda_prefix))):
+            conda_prefix = sys.prefix
+            conda_env = os.path.basename(sys.prefix)
     elif virtual_env:
         tipo = "venv"
     elif "google.colab" in sys.modules or os.path.exists("/content"):
@@ -56,7 +60,17 @@ def detectar_gestor_entorno() -> dict:
 def version_paquete(nombre: str) -> str:
     try:
         mod = importlib.import_module(nombre)
-        return str(getattr(mod, "__version__", "instalado (sin __version__)"))
+        ver = getattr(mod, "__version__", None)
+        if ver:
+            return str(ver)
+        from importlib.metadata import PackageNotFoundError, version as pkg_version
+
+        for dist_name in (nombre, nombre.replace("_", "-")):
+            try:
+                return pkg_version(dist_name)
+            except PackageNotFoundError:
+                pass
+        return "instalado (sin __version__)"
     except Exception as exc:
         return f"no disponible ({type(exc).__name__})"
 

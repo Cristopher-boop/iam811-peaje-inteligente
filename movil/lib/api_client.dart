@@ -42,7 +42,7 @@ class TollApiClient {
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({'id_token': idToken}),
         )
-        .timeout(const Duration(seconds: 20));
+        .timeout(const Duration(seconds: 65));
 
     final data = jsonDecode(utf8.decode(resp.bodyBytes)) as Map<String, dynamic>;
     if (resp.statusCode != 200) {
@@ -68,7 +68,7 @@ class TollApiClient {
       ..fields['caseta_id'] = casetaId.toString()
       ..files.add(http.MultipartFile.fromBytes('file', jpegBytes, filename: 'frame.jpg'));
 
-    final streamed = await req.send().timeout(const Duration(seconds: 25));
+    final streamed = await req.send().timeout(const Duration(seconds: 40));
     final resp = await http.Response.fromStream(streamed);
     final data = jsonDecode(utf8.decode(resp.bodyBytes)) as Map<String, dynamic>;
     if (resp.statusCode != 200) {

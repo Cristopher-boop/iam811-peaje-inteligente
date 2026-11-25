@@ -1,0 +1,41 @@
+{
+  "servicio": "peaje-web",
+  "timestamp_utc": "2026-11-25T11:16:34.542376+00:00",
+  "sistema": {
+    "os": "Windows-10-10.0.26300-SP0",
+    "python_version": "3.11.18",
+    "arquitectura": "AMD64"
+  },
+  "entorno": {
+    "tipo": "mamba/conda",
+    "conda_default_env": "peaje-web",
+    "conda_prefix": "C:\\Users\\hp\\miniconda3\\envs\\peaje-web",
+    "virtual_env": null,
+    "executable": "C:\\Users\\hp\\miniconda3\\envs\\peaje-web\\python.exe"
+  },
+  "cuda": {
+    "disponible": false,
+    "cuda_build": null,
+    "gpu_count": 0,
+    "gpu_name": null,
+    "error": "No module named 'torch'"
+  },
+  "paquetes": {
+    "torch": "no disponible (ModuleNotFoundError)",
+    "torchvision": "no disponible (ModuleNotFoundError)",
+    "ultralytics": "no disponible (ModuleNotFoundError)",
+    "cv2": "no disponible (ModuleNotFoundError)",
+    "numpy": "no disponible (ModuleNotFoundError)",
+    "onnxruntime": "no disponible (ModuleNotFoundError)",
+    "fast_plate_ocr": "no disponible (ModuleNotFoundError)",
+    "easyocr": "no disponible (ModuleNotFoundError)",
+    "fastapi": "0.115.12",
+    "uvicorn": "0.34.0",
+    "sqlalchemy": "2.0.39",
+    "psycopg": "3.2.6",
+    "httpx": "0.28.1",
+    "openai": "1.68.2",
+    "roboflow": "no disponible (ModuleNotFoundError)"
+  },
+  "onnxruntime_providers": []
+}

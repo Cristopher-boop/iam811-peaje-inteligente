@@ -2,7 +2,7 @@
 
 **Asignatura:** IAM-811 Machine Learning y Aprendizaje Profundo  
 **Estudiante:** `Cristopher Diego Rodriguez Ayala` (`cristopherrodriguez1510@gmail.com`)  
-**Fecha:** `[COMPLETAR FECHA]`
+**Fecha:** `2026-11-25`
 
 ---
 
@@ -11,7 +11,7 @@
 El sistema implementa el control automatizado de peaje vehicular de punta a punta sin depender de recursos locales durante la demostración ni revisión:
 
 - **Captura Móvil (Flutter):** Inicia sesión mediante Google Sign-In (`id_token`), opera en *Modo Caseta* enviando frames de video (2–3 fps o disparo manual) y en *Modo Consulta* enviando placas en texto o fotografía al agente conversacional.
-- **Aplicación Web y API REST (FastAPI + PostgreSQL en la nube):** Publicada en subdominio HTTPS (`[COMPLETAR URL]`), implementa OAuth 2.0 exclusivo con Google, lista blanca de usuarios con roles (`admin` / `operador`), lógica de tarifas por categoría y número de ejes, generación automática de alertas, panel en tiempo real mediante **Server-Sent Events (SSE)** y agente conversacional con **Qwen**.
+- **Aplicación Web y API REST (FastAPI + PostgreSQL en la nube):** Publicada en subdominio HTTPS (`https://peaje-iam811-web.onrender.com`), implementa OAuth 2.0 exclusivo con Google, lista blanca de usuarios con roles (`admin` / `operador`, incluyendo `doc.alvaro.pinto.ma@unifranz.edu.bo` como `admin`), lógica de tarifas por categoría y número de ejes, generación automática de alertas, panel en tiempo real mediante **Server-Sent Events (SSE)** y agente conversacional con LLM vía API OpenAI-compatible (OpenRouter, con respaldo determinístico SQL).
 - **Inferencia Unificada en la Nube (RunPod GPU Pod):** Expone un único endpoint `POST /predict` protegido por token (`INFERENCE_URL`) que ejecuta secuencialmente **M1 (YOLOv9-t ONNX + OCR híbrido)**, **M2 (YOLO11s-seg)** y **M3 (YOLO11s-pose)**.
 
 ---
@@ -19,16 +19,22 @@ El sistema implementa el control automatizado de peaje vehicular de punta a punt
 ## 2. Datasets y Aumentaciones (Roboflow)
 
 ### 2.1 Modelo M2 — Segmentación de Instancias de Vehículos
+- **Proyecto Roboflow:** `cristopher-diego-rodriguez-ayala/peaje-vehiculos-seg-6laub` (**Versión 1** publicada).
 - **Clases (5):** `moto`, `auto`, `minibus`, `camion`, `bus`.
-- **Origen de datos:** Combinación de datasets públicos de Roboflow Universe e imágenes propias del parque automotor local (autos, motocicletas, minibuses/trufis, buses y camiones), revisadas manualmente en Roboflow (*Instance Segmentation*).
-- **Cantidad de imágenes:** `[COMPLETAR: ej. XXX train / XXX valid / XXX test]`.
-- **Aumentaciones aplicadas en Roboflow:** `[COMPLETAR: ej. Horizontal Flip, Brightness ±15%, Blur hasta 1.0px, Rotación ±10°]`.
+- **Origen de datos:** Combinación curada de transporte público boliviano (`lab2e3/transporte-publico-bolivia` v3 y `jaqueline-paola-coronel-condori/transporte-publico` v1) con tráfico multimodal (`helmet-o8tke/vehicle-segmentation-pyt1u` v1, excluyendo rickshaws y clases ajenas al peaje), normalizada en formato COCO de segmentación por instancias (`docs/resumen_datasets_roboflow.json`).
+- **Cantidad de imágenes:**
+  - Base subida: `1,493` train / `543` valid (`2,036` imágenes; instancias base: `auto: 3,557`, `moto: 1,007`, `camion: 843`, `minibus: 529`, `bus: 524`).
+  - Versión 1 exportada (YOLO11-seg tras aumentación 2x): `2,986` train (`9,452` polígonos) / `543` valid (`1,727` polígonos) = **`3,529` imágenes / `11,179` polígonos**.
+- **Preprocesamiento y aumentaciones aplicadas en Roboflow:** `Auto-Orient`, `Resize Stretch 640×640`, `Horizontal Flip`, `Brightness ±15%`, `Blur 1.0px`, `Rotate ±10°`.
 
 ### 2.2 Modelo M3 — Keypoints de Ruedas (Conteo de Ejes)
+- **Proyecto Roboflow:** `cristopher-diego-rodriguez-ayala/peaje-llantas-keypoints` (**Versión 1** publicada).
 - **Esquema:** 1 clase (`llanta`) con 5 keypoints ordenados (`centro`, `contacto`, `superior`, `izquierda`, `derecha`), `kpt_shape: [5, 3]`, `flip_idx: [0, 1, 2, 4, 3]`.
-- **Origen de datos:** >=200 imágenes laterales y en perspectiva 3/4 (autos, motos, minibuses, buses y camiones de 2, 3 y 4+ ejes), pre-etiquetadas en Colab y corregidas manualmente en Roboflow (*Keypoint Detection*).
-- **Cantidad de imágenes:** `[COMPLETAR]`.
-- **Aumentaciones aplicadas:** `[COMPLETAR]`.
+- **Origen de datos:** Combinación de `datacluster-labs-agryi/vehicle-wheel-detection` v1 (motos, vehículos ligeros y camiones `six_wheeler` / `eight_wheeler`), `faisal-sduw7/vehicle-wheel` v9 y muestras de buses/camiones pre-etiquetadas con `YOLOE` (`yoloe-11s-seg.pt`).
+- **Cantidad de imágenes:**
+  - Base subida: `390` train / `146` valid (`536` imágenes base con `1,183` llantas anotadas de 5 keypoints).
+  - Versión 1 exportada (YOLO Pose tras aumentación 2x): `778` train (`1,682` llantas) / `146` valid (`341` llantas) = **`924` imágenes / `2,023` llantas** (`20` columnas por instancia verificadas).
+- **Preprocesamiento y aumentaciones aplicadas en Roboflow:** `Auto-Orient`, `Resize Stretch 640×640`, `Horizontal Flip`, `Brightness ±15%`.
 
 ---
 
@@ -37,22 +43,24 @@ El sistema implementa el control automatizado de peaje vehicular de punta a punt
 ### 3.1 M1 — Detección de Placas + OCR
 - **Detector:** `yolo-v9-t-384-license-plates-end2end.onnx` (reutilizado).
 - **OCR:** Pipeline híbrido `fast-plate-ocr` (`cct_xs_v2_global.onnx`) + `EasyOCR` con filtrado de altura de caracteres y normalización boliviana (`^\d{3,4}[A-Z]{3}$`).
-- **Métricas medidas (`resumen_metricas_m1.json`):**
-  - Tasa de detección de placa: `[COMPLETAR %]`
-  - Exactitud OCR (Exact Match): `[COMPLETAR %]`
-  - Character Error Rate (CER): `[COMPLETAR]`
+- **Métricas medidas localmente (`docs/resumen_metricas_m1.json`):**
+  - *Evaluación en autopista real* (`49` imágenes de `vehicle-segmentation-pyt1u` con placa anotada >= 36 px):
+    - Tasa de detección de placa: **`95.92%`** (`47/49`, confianza promedio `0.7537`)
+    - Tasa de lectura no vacía (híbrido / `fast-plate-ocr`): **`91.84%`** vs `EasyOCR` solo: `18.37%` (confianza OCR promedio `0.6151`)
+  - *Evaluación controlada formato Bolivia* (`10` escenas con franja `"BOLIVIA"` + `^\d{3,4}[A-Z]{3}$`):
+    - Detección: **`100%`** (`10/10`) | Exact Match híbrido: **`90.0%`** (`9/10`) vs `EasyOCR` `80.0%` | **CER promedio:** **`0.0143`**
 
 ### 3.2 M2 — Segmentación de Instancias (`yolo11s-seg`)
-- **Métricas (`resumen_metricas_m2.json`):**
-  - `box mAP@50`: `[COMPLETAR]` | `box mAP@50-95`: `[COMPLETAR]`
-  - `mask mAP@50`: `[COMPLETAR]` | `mask mAP@50-95`: `[COMPLETAR]`
-  - `mask mAP@50` por clase (`moto`, `auto`, `minibus`, `camion`, `bus`): `[COMPLETAR]`
+- **Métricas (`resumen_metricas_m2.json` tras ejecutar `entrenamiento/M2_segmentacion_vehiculos.ipynb` en Colab T4):**
+  - `box mAP@50`: `[PENDIENTE EJECUTAR EN COLAB T4]` | `box mAP@50-95`: `[PENDIENTE]`
+  - `mask mAP@50`: `[PENDIENTE EJECUTAR EN COLAB T4]` | `mask mAP@50-95`: `[PENDIENTE]`
+  - `mask mAP@50` por clase (`moto`, `auto`, `minibus`, `camion`, `bus`): `[PENDIENTE]`
 
 ### 3.3 M3 — Keypoints de Ruedas y Conteo de Ejes (`yolo11s-pose`)
-- **Métricas (`resumen_metricas_m3.json`):**
-  - `box mAP@50`: `[COMPLETAR]`
-  - `pose mAP@50 (OKS)`: `[COMPLETAR]` | `pose mAP@50-95`: `[COMPLETAR]`
-  - Error en conteo de ejes (`MAE` / exactitud): `[COMPLETAR]`
+- **Métricas (`resumen_metricas_m3.json` tras ejecutar `entrenamiento/M3_keypoints_ruedas.ipynb` en Colab T4):**
+  - `box mAP@50`: `[PENDIENTE EJECUTAR EN COLAB T4]`
+  - `pose mAP@50 (OKS)`: `[PENDIENTE EJECUTAR EN COLAB T4]` | `pose mAP@50-95`: `[PENDIENTE]`
+  - Error en conteo de ejes (`MAE` / exactitud): `[PENDIENTE]`
 
 ---
 
@@ -60,11 +68,10 @@ El sistema implementa el control automatizado de peaje vehicular de punta a punt
 
 - **Mecanismo de tiempo real:** **Server-Sent Events (SSE)** sobre `/api/v1/stream` (con respaldo WebSocket `/api/v1/ws/panel`), elegido por su compatibilidad nativa con proxies HTTPS de PaaS y reconexión automática en navegadores sin requerir servidor broker separado.
 - **Desglose de latencia promedio observada:**
-  - M1 Detección + OCR: `[COMPLETAR ms]`
-  - M2 Segmentación: `[COMPLETAR ms]`
-  - M3 Keypoints + conteo de ejes: `[COMPLETAR ms]`
-  - Total inferencia en GPU RunPod: `[COMPLETAR ms]`
-  - Punta a punta (App móvil → Web HTTPS → RunPod → BD PostgreSQL → Panel SSE): `[COMPLETAR ms]`
+  - M1 Detección + OCR (benchmark CPU local 49 imgs): **`164.05 ms`**
+  - Pipeline completo `/predict` en CPU local (imagen real de bus `640×480`, `yolo11s-seg` respaldo + M1+OCR): **`381.0 ms`** (`m1_placa: 29.8 ms`, `m1_ocr: 164.5 ms`, `m2_seg: 155.3 ms`)
+  - Total inferencia en GPU RunPod: `[PENDIENTE MEDIR TRAS INICIAR POD GPU]`
+  - Punta a punta (App móvil → Web HTTPS Render → RunPod GPU → Neon PostgreSQL → Panel SSE): `[PENDIENTE MEDIR EN PRUEBA CON POD GPU ACTIVO]`
 
 ---
 
