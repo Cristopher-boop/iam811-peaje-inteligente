@@ -7,7 +7,7 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "https://peaje-iam811.onrender.com"
+      "value": "https://peaje-iam811-web.onrender.com"
     },
     {
       "key": "jwt_token",

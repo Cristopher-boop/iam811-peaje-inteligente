@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AppConfig {
   static const String defaultBackendUrl = String.fromEnvironment(
     'BACKEND_URL',
-    defaultValue: 'https://peaje-iam811.onrender.com',
+    defaultValue: 'https://peaje-iam811-web.onrender.com',
   );
 
   static const String defaultServerClientId = String.fromEnvironment(

@@ -6,7 +6,7 @@ import 'package:peaje_movil/main.dart';
 void main() {
   testWidgets('Renderiza pantalla de login Google', (WidgetTester tester) async {
     final config = AppConfig(
-      backendUrl: 'https://peaje-iam811.onrender.com',
+      backendUrl: 'https://peaje-iam811-web.onrender.com',
       googleServerClientId: '',
     );
     await tester.pumpWidget(PeajeApp(api: TollApiClient(config)));

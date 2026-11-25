@@ -72,7 +72,7 @@ def build_postman_collection(openapi_spec: dict) -> dict:
             "description": openapi_spec.get("info", {}).get("description", ""),
         },
         "variable": [
-            {"key": "base_url", "value": "https://peaje-iam811.onrender.com"},
+            {"key": "base_url", "value": "https://peaje-iam811-web.onrender.com"},
             {"key": "jwt_token", "value": ""},
         ],
         "item": items,
