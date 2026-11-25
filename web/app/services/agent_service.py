@@ -100,87 +100,100 @@ async def ejecutar_agente(
     if consulta_directa is None and placa_en_texto:
         consulta_directa = consultar_placa_bd(db, placa_en_texto)
 
-    # 3. Llamada a Qwen via API Web (con Function Calling) si hay API key configurada
+    # 3. Llamada a LLM via API Web (con Function Calling y respaldo automatico entre modelos gratuitos)
     if settings.qwen_api_key:
-        try:
-            client = AsyncOpenAI(
-                base_url=settings.qwen_base_url,
-                api_key=settings.qwen_api_key,
-                timeout=18.0,
-            )
-            messages: list[dict[str, Any]] = [{"role": "system", "content": SYSTEM_PROMPT}]
-            if imagen_bytes is not None and consulta_directa is not None:
-                user_prompt = (
-                    f"El usuario envio una imagen de placa. El sistema OCR detecto '{consulta_directa['placa_normalizada']}' "
-                    f"(confianza {ocr_info['confianza']}). Resultado real de la base de datos:\n"
-                    f"{json.dumps(consulta_directa, ensure_ascii=False)}\n"
-                    f"Mensaje adicional del usuario: {mensaje or '(ninguno)'}"
-                )
-                messages.append({"role": "user", "content": user_prompt})
+        modelos_candidatos = []
+        for m in (
+            settings.qwen_model,
+            "nvidia/nemotron-3.5-lightning:free",
+            "openrouter/free",
+            "nvidia/nemotron-3-ultra-550b-a55b:free",
+            "baidu/ernie-5.5-flash-preview:free",
+        ):
+            if m and m not in modelos_candidatos:
+                modelos_candidatos.append(m)
+
+        client = AsyncOpenAI(
+            base_url=settings.qwen_base_url,
+            api_key=settings.qwen_api_key,
+            timeout=12.0,
+            max_retries=0,
+        )
+        for modelo_activo in modelos_candidatos:
+            try:
+                messages: list[dict[str, Any]] = [{"role": "system", "content": SYSTEM_PROMPT}]
+                if imagen_bytes is not None and consulta_directa is not None:
+                    user_prompt = (
+                        f"El usuario envio una imagen de placa. El sistema OCR detecto '{consulta_directa['placa_normalizada']}' "
+                        f"(confianza {ocr_info['confianza']}). Resultado real de la base de datos:\n"
+                        f"{json.dumps(consulta_directa, ensure_ascii=False)}\n"
+                        f"Mensaje adicional del usuario: {mensaje or '(ninguno)'}"
+                    )
+                    messages.append({"role": "user", "content": user_prompt})
+                    comp = await client.chat.completions.create(
+                        model=modelo_activo,
+                        messages=messages,
+                        temperature=0.1,
+                        max_tokens=450,
+                    )
+                    texto_resp = comp.choices[0].message.content or _formatear_respuesta_deterministica(consulta_directa, True)
+                    return {
+                        "respuesta": texto_resp,
+                        "estado_sistema": consulta_directa["estado_sistema"],
+                        "placa_normalizada": consulta_directa["placa_normalizada"],
+                        "ocr": ocr_info,
+                        "consulta": consulta_directa,
+                        "modelo_llm": modelo_activo,
+                    }
+
+                messages.append({"role": "user", "content": mensaje or "Hola"})
                 comp = await client.chat.completions.create(
-                    model=settings.qwen_model,
+                    model=modelo_activo,
                     messages=messages,
+                    tools=TOOLS,
+                    tool_choice="auto",
                     temperature=0.1,
                     max_tokens=450,
                 )
-                texto_resp = comp.choices[0].message.content or _formatear_respuesta_deterministica(consulta_directa, True)
+                choice_msg = comp.choices[0].message
+                tool_calls = getattr(choice_msg, "tool_calls", None) or []
+
+                if tool_calls:
+                    messages.append(choice_msg.model_dump())
+                    for tc in tool_calls:
+                        if tc.function.name == "consultar_placa_sistema":
+                            args = json.loads(tc.function.arguments or "{}")
+                            consulta_directa = consultar_placa_bd(db, args.get("placa", ""))
+                            messages.append({
+                                "role": "tool",
+                                "tool_call_id": tc.id,
+                                "content": json.dumps(consulta_directa, ensure_ascii=False),
+                            })
+                    comp2 = await client.chat.completions.create(
+                        model=modelo_activo,
+                        messages=messages,
+                        temperature=0.1,
+                        max_tokens=450,
+                    )
+                    texto_resp = comp2.choices[0].message.content or (
+                        _formatear_respuesta_deterministica(consulta_directa) if consulta_directa else "Consulta procesada."
+                    )
+                else:
+                    if consulta_directa is not None:
+                        texto_resp = _formatear_respuesta_deterministica(consulta_directa)
+                    else:
+                        texto_resp = choice_msg.content or "Indicame el numero de placa en texto o sube una imagen para verificar su estado."
+
                 return {
                     "respuesta": texto_resp,
-                    "estado_sistema": consulta_directa["estado_sistema"],
-                    "placa_normalizada": consulta_directa["placa_normalizada"],
+                    "estado_sistema": consulta_directa["estado_sistema"] if consulta_directa else None,
+                    "placa_normalizada": consulta_directa["placa_normalizada"] if consulta_directa else "",
                     "ocr": ocr_info,
                     "consulta": consulta_directa,
-                    "modelo_llm": settings.qwen_model,
+                    "modelo_llm": modelo_activo,
                 }
-
-            messages.append({"role": "user", "content": mensaje or "Hola"})
-            comp = await client.chat.completions.create(
-                model=settings.qwen_model,
-                messages=messages,
-                tools=TOOLS,
-                tool_choice="auto",
-                temperature=0.1,
-                max_tokens=450,
-            )
-            choice_msg = comp.choices[0].message
-            tool_calls = getattr(choice_msg, "tool_calls", None) or []
-
-            if tool_calls:
-                messages.append(choice_msg.model_dump())
-                for tc in tool_calls:
-                    if tc.function.name == "consultar_placa_sistema":
-                        args = json.loads(tc.function.arguments or "{}")
-                        consulta_directa = consultar_placa_bd(db, args.get("placa", ""))
-                        messages.append({
-                            "role": "tool",
-                            "tool_call_id": tc.id,
-                            "content": json.dumps(consulta_directa, ensure_ascii=False),
-                        })
-                comp2 = await client.chat.completions.create(
-                    model=settings.qwen_model,
-                    messages=messages,
-                    temperature=0.1,
-                    max_tokens=450,
-                )
-                texto_resp = comp2.choices[0].message.content or (
-                    _formatear_respuesta_deterministica(consulta_directa) if consulta_directa else "Consulta procesada."
-                )
-            else:
-                if consulta_directa is not None:
-                    texto_resp = _formatear_respuesta_deterministica(consulta_directa)
-                else:
-                    texto_resp = choice_msg.content or "Indicame el numero de placa en texto o sube una imagen para verificar su estado."
-
-            return {
-                "respuesta": texto_resp,
-                "estado_sistema": consulta_directa["estado_sistema"] if consulta_directa else None,
-                "placa_normalizada": consulta_directa["placa_normalizada"] if consulta_directa else "",
-                "ocr": ocr_info,
-                "consulta": consulta_directa,
-                "modelo_llm": settings.qwen_model,
-            }
-        except Exception as exc:
-            logger.warning("Fallo consulta a Qwen API, usando respaldo deterministico: %s", exc)
+            except Exception as exc:
+                logger.warning("Fallo consulta a LLM %s, probando siguiente respaldo: %s", modelo_activo, exc)
 
     # 4. Respaldo deterministico (garantiza 100% disponibilidad aunque falte QWEN_API_KEY o haya timeout)
     if consulta_directa is not None:

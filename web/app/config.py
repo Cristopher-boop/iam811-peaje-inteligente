@@ -59,7 +59,7 @@ class Settings:
 
         self.qwen_base_url = os.environ.get("QWEN_BASE_URL", "https://openrouter.ai/api/v1")
         self.qwen_api_key = os.environ.get("QWEN_API_KEY", "")
-        self.qwen_model = os.environ.get("QWEN_MODEL", "google/gemma-4-31b-it:free")
+        self.qwen_model = os.environ.get("QWEN_MODEL", "nvidia/nemotron-3.5-lightning:free")
 
 
 @lru_cache
