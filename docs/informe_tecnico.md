@@ -80,7 +80,7 @@ El sistema implementa el control automatizado de peaje vehicular de punta a punt
 
 ## 5. Gestión de Entornos (Bonificación `conda`, `mamba`, `venv`)
 
-Los entornos están fijados en `entrenamiento/environment.yml`, `inferencia/environment.yml` / `requirements.txt` y `web/requirements.txt`, validados mediante `docs/diagnostico_entorno.py` en Google Colab, RunPod y el servidor web en la nube.
+Los entornos están fijados en `entrenamiento/environment.yml`, `inferencia/environment.yml` / `requirements.txt` y `web/requirements.txt`, validados mediante `docs/diagnostico_entorno.py` en los entornos locales (`docs/diagnostico_peaje_ml.json`, `docs/diagnostico_peaje_web.json`) y en la GPU en la nube de RunPod (`docs/diagnostico_runpod.json`).
 
 ---
 
