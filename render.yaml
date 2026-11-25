@@ -17,7 +17,7 @@ services:
       - key: QWEN_BASE_URL
         value: https://openrouter.ai/api/v1
       - key: QWEN_MODEL
-        value: qwen/qwen-2.5-72b-instruct
+        value: google/gemma-4-31b-it:free
       - key: ADMIN_EMAILS
         value: doc.alvaro.pinto.ma@unifranz.edu.bo,cristopherrodriguez1510@gmail.com
       - key: DATABASE_URL
